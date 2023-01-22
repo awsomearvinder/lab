@@ -1,0 +1,9 @@
+- name: VyOS configuration
+  hosts: router_main
+  gather_facts: false
+  tasks:
+    - name: setup config
+      vyos.vyos.vyos_config:
+        match: "none"
+        src: router_main.cfg
+        save: true

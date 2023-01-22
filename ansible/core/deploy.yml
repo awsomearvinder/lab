@@ -2,14 +2,9 @@
   hosts: router_main
   gather_facts: false
   tasks:
-    - name: reset config
-      vyos.vyos.vyos_command:
-        commands:
-          - configure
-          - load /opt/vyatta/etc/config.boot.default
-
     - name: setup config
       vyos.vyos.vyos_config:
+        match: "none"
         lines:
 
           # SET SSH KEY

@@ -1,0 +1,117 @@
+- name: bootstrap sidero.
+  hosts: bootstrap_vm
+  become: yes
+  vars:
+    host_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+  tasks:
+    - name: Install aptitude
+      apt:
+        name: aptitude
+        state: latest
+        update_cache: true
+    - name: Install required system packages
+      apt:
+        pkg:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - python3-pip
+          - virtualenv
+          - python3-setuptools
+        state: latest
+        update_cache: true
+
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    - name: Update apt and install docker-ce
+      apt:
+        name: docker-ce
+        state: latest
+        update_cache: true
+
+    - name: install kubectl
+      get_url: 
+        url: "https://dl.k8s.io/release/v1.26.1/bin/linux/amd64/kubectl"
+        dest: /usr/local/bin/kubectl
+        mode: '0755'
+
+    - name: install clusterctl
+      get_url: 
+        url: "https://github.com/kubernetes-sigs/cluster-api/releases/download/v1.1.1/clusterctl-linux-amd64"
+        dest: /usr/local/bin/clusterctl
+        mode: '0755'
+
+    - name: install talosctl
+      get_url: 
+        url: "https://github.com/talos-systems/talos/releases/latest/download/talosctl-linux-amd64"
+        dest: /usr/local/bin/talosctl
+        mode: '0755'
+
+    - name: check if cluster exists
+      ansible.builtin.command: |
+        talosctl cluster show --name bootstrap-cluster
+      changed_when: false
+      register: cluster_show
+
+    - block:
+        - name: create clutser
+          ansible.builtin.command: |
+            talosctl cluster create \
+              --name bootstrap-cluster \
+              -p 69:69/udp,8081:8081/tcp,51821:51821/udp \
+              --workers 0 \
+              --config-patch '[{"op": "add", "path": "/cluster/allowSchedulingOnMasters", "value": true}]' \
+              --endpoint "{{ host_ip }}"
+          when: cluster_show.stdout is not regex('NODES:\n+\S.*\n+\S')
+          register: create_cluster_result
+          notify: 
+            - taint_node
+      rescue:
+        - name: Failed to create cluster, show error
+          debug:
+            msg: "{{ create_cluster_result.stderr }}"
+        - name: Failed to create cluster, show error
+          fail:
+            msg: "failed to create cluster"
+
+    - name: ensure cluster-api dir exists
+      file: 
+        path: ~/.cluster-api/
+        state: directory
+
+    - name: copy clusterctl config
+      copy:
+        content: |
+          providers:
+            - name: "talos"
+              url: "https://github.com/siderolabs/cluster-api-bootstrap-provider-talos/releases/latest/bootstrap-components.yaml"
+              type: "BootstrapProvider"
+            - name: "talos"
+              url: "https://github.com/siderolabs/cluster-api-control-plane-provider-talos/releases/latest/control-plane-components.yaml"
+              type: "ControlPlaneProvider"
+            - name: "sidero"
+              url: "https://github.com/siderolabs/sidero/releases/latest/infrastructure-components.yaml"
+              type: "InfrastructureProvider"
+        dest: ~/.cluster-api/clusterctl.yml
+
+    - name: init sidero
+      ansible.builtin.command: |
+        clusterctl init -b talos -c talos -i sidero
+      environment:
+        SIDERO_CONTROLLER_MANAGER_API_ENDPOINT: "true"
+        SIDERO_CONTROLLER_MANAGER_HOST_NETWORK: "{{ host_ip }}"
+
+  handlers:
+    - name: taint_node
+      ansible.builtin.command: |
+        kubectl taint node bootstrap-cluster-controlplane-1 node-role.kubernetes.io/master:NoSchedule-
+

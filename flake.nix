@@ -18,6 +18,10 @@
             ansible_network_os = "vyos";
             ansible_connection = "network_cli";
           };
+          bootstrap_vm = {
+            ansible_host = "192.168.2.82";
+            ansible_user = "bender";
+          };
         };
       };
     };

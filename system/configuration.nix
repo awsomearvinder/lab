@@ -1,6 +1,7 @@
 {...}: {
   imports = [
     ./hardware-configuration.nix
+    ./kanidm.nix
   ];
 
   boot.cleanTmpDir = true;

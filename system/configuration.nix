@@ -2,6 +2,7 @@
   imports = [
     ./hardware-configuration.nix
     ./kanidm.nix
+    ./gitea.nix
   ];
 
   boot.cleanTmpDir = true;

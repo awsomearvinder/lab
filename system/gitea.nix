@@ -4,6 +4,7 @@
     rootUrl = "https://git.public.arvinderd.com";
     settings = {
       session.COOKIE_SECURE = true;
+      service.DISABLE_REGISTRATION = true;
     };
     domain = "git.public.arvinderd.com";
     httpAddress = "::1";

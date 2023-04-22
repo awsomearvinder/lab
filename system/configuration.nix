@@ -5,6 +5,9 @@
     ./gitea.nix
   ];
 
+  sops.defaultSopsFile = ../secrets/lab.yaml;
+  sops.age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
+
   boot.cleanTmpDir = true;
   zramSwap.enable = false;
   networking.hostName = "linode-nixos";

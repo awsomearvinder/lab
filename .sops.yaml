@@ -1,0 +1,9 @@
+keys:
+  - &server_lab age1aas0a3a93se0yr2ap6xvhy0h9hqwcmchms0kkxj325pc58jjty9s5u9umw
+  - &bender age1p0lmx56454u2h9m6h44r3vgc9eu6c8la692q9flvw5ksw05ewe4qs6dwug
+creation_rules:
+  - path_regex: secrets/lab.yaml
+    key_groups:
+      - age:
+        - *bender
+        - *server_lab

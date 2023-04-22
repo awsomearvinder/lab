@@ -1,0 +1,9 @@
+pipeline:
+  verify:
+    when:
+      event: [push, pull_request]
+    image: nixos/nix:latest
+    commands:
+    - echo "experimental-features = nix-command flakes" >> /etc/nix/nix.conf
+    - nix flake check --no-update-lock-file
+

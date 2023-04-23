@@ -1,13 +1,15 @@
 {...}: {
   services.gitea = {
     enable = true;
-    rootUrl = "https://git.public.arvinderd.com";
     settings = {
+      server = {
+        ROOT_URL = "https://git.public.arvinderd.com";
+        HTTP_ADDR = "::1";
+        DOMAIN = "git.public.arvinderd.com";
+      };
       session.COOKIE_SECURE = true;
       service.DISABLE_REGISTRATION = true;
     };
-    domain = "git.public.arvinderd.com";
-    httpAddress = "::1";
   };
   sops.secrets.woodpecker-env = {
     mode = "0444";

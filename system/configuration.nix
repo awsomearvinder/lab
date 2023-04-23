@@ -8,6 +8,12 @@
   sops.defaultSopsFile = ../secrets/lab.yaml;
   sops.age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
 
+  nix.gc = {
+    automatic = true;
+    dates = "daily";
+    options = "--delete-older-than 30d";
+  };
+
   boot.tmp.cleanOnBoot = true;
   zramSwap.enable = false;
   networking.hostName = "linode-nixos";

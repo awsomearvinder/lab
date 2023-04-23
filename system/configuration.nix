@@ -17,4 +17,5 @@
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPbJuiw1aOPykLtDP2hQCEifKP2QBwh+wJ0ktYjv6S7P bender@desktop"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIelQTt1o9ZWEx5ZODwum+r7m382aJP/gOTopyPiVKMK root@linode-nixos" # CI
   ];
+  system.stateVersion = "23.05";
 }

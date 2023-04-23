@@ -8,7 +8,7 @@
   sops.defaultSopsFile = ../secrets/lab.yaml;
   sops.age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
 
-  boot.cleanTmpDir = true;
+  boot.tmp.cleanOnBoot = true;
   zramSwap.enable = false;
   networking.hostName = "linode-nixos";
   networking.tempAddresses = "disabled";

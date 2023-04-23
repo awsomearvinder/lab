@@ -1,0 +1,32 @@
+pipeline:
+  deploy:
+    when:
+      event: [push]
+      repo: bender/lab
+    image: nixos/nix:latest
+    commands:
+
+    # install nix tools
+    - echo "experimental-features = nix-command flakes" >> /etc/nix/nix.conf
+    - nix profile install nixpkgs#nixos-rebuild
+
+    # setup ssh
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo "$DEPLOY_KEY" > ~/.ssh/.id_ed25519
+    - chmod "0400" ~/.ssh/.id_ed25519
+    - echo "idm.public.arvinderd.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDM4HPYhNIOxxZ8a1G4Jz27Kf96jGn95XjTzaS71QC50jVtBzAwgeuLZ9ZXKS32zXTdBg6pc+MkkjWR+M3+scSfq+PALcHDTn8qXKZIf6oceLNY10atnLUfoA2kTfvkCJp3GNjUud84l8y2Ami1Xmh/okj5qr7Nyv3Yooi9h7NxF62dhOJwZyQX3UHbYSWC+hE6oHSThPUMtJ5VGKWIBcieqp3JpoCnp1B2khqsgBY9/XH4j0lC/Js39u2k9LIyDl3JgxYuXUGuhgsasEe+ky5b6LnYS/sh8T1LFeO9Ldb1hkkn9XDgD50BetVUzTDHertNpe7AC7CoVV6LElxkjNWyOhoM0DomIx4CQIOkRjREjBG+9GO+oi0MFAxHB3JHeXyPOISpjrJfgUaNN5j05WYEiZXnUwVUqORNx6lLFVdkZXh5Mf5oL9k4jMF+JEn4oN3I29NNr9J/tby0W5DuIw8wNdRBX5D76uPNe+qmfCEgDwgePYGUbVi7sb8fY4jDiUk=" > ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+
+    # deploy
+    -
+        NIX_SSHOPTS="-i ~/.ssh/.id_ed25519 -o UserKnownHostsFile=~/.ssh/known_hosts" nixos-rebuild switch
+          --flake '.#lab'
+          --target-host root@idm.public.arvinderd.com
+          --build-host root@idm.public.arvinderd.com
+    secrets: [deploy_key]
+
+
+depends_on:
+  - check
+branches: [master]

@@ -22,6 +22,7 @@
   users.users.root.openssh.authorizedKeys.keys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPbJuiw1aOPykLtDP2hQCEifKP2QBwh+wJ0ktYjv6S7P bender@desktop"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIelQTt1o9ZWEx5ZODwum+r7m382aJP/gOTopyPiVKMK root@linode-nixos" # CI
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMztLpThvXPu85+kGuD/OVdpUNAXbPpYtcPUIyU96PU1 bender@bender_desktop" # windows desktop
   ];
   system.stateVersion = "23.05";
 }

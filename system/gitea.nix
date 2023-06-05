@@ -8,7 +8,7 @@
         DOMAIN = "git.public.arvinderd.com";
       };
       session.COOKIE_SECURE = true;
-      service.DISABLE_REGISTRATION = true;
+      service.ALLOW_ONLY_EXTERNAL_REGISTRATION = true;
     };
   };
   sops.secrets.woodpecker-env = {

@@ -3,6 +3,7 @@
     ./hardware-configuration.nix
     ./kanidm.nix
     ./gitea.nix
+    ./headscale.nix
   ];
 
   sops.defaultSopsFile = ../secrets/lab.yaml;

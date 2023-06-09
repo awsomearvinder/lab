@@ -16,6 +16,18 @@
         client_id = "headscale";
         client_secret_path = "/run/secrets/headscale/oauth-secret";
       };
+      derp = {
+        server = {
+          enabled = true;
+          region_id = 999; # no clue what this actually does.
+
+          region_code = "headscale";
+          region_name = "headscale embedded derp";
+
+          stun_listen_addr = "[::]:3478";
+        };
+        urls = [];
+      };
     };
   };
   services.caddy = {
@@ -55,5 +67,6 @@
   };
   networking.firewall = {
     allowedTCPPorts = [443 80];
+    allowedUDPPorts = [3478];
   };
 }

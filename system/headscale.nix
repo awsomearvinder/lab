@@ -1,4 +1,8 @@
 {...}: {
+  sops.secrets."headscale/oauth-secret" = {
+    mode = "0440";
+    owner = "headscale";
+  };
   services.headscale = {
     enable = true;
       address = "[::1]";
@@ -7,6 +11,11 @@
       tls_key_path = "/var/lib/acme/headscale.public.arvinderd.com/key.pem";
       tls_cert_path = "/var/lib/acme/headscale.public.arvinderd.com/cert.pem";
       server_url = "https://headscale.public.arvinderd.com";
+      oidc = {
+        issuer = "https://idm.public.arvinderd.com/oauth2/openid/headscale";
+        client_id = "headscale";
+        client_secret_path = "/run/secrets/headscale/oauth-secret";
+      };
     };
   };
   services.caddy = {

@@ -64,20 +64,16 @@
         subdomain = "*.jingliu";
       }
     ];
-    # this needs to be done like this because someone needs to update the module to
-    # support passing things in at runtime as a file.
-    settings = {
-      secretApiKey = "";
-      apiKey = "";
-    };
+    apiKeyFile = config.age.secrets.oinkKeyFile.path;
+    secretApiKeyFile = config.age.secrets.oinkSecretKeyFile.path;
   };
 
-  age.secrets.oink.file = ../secrets/oink.age;
-  age.secrets.oink.owner = config.systemd.services.oink.user or "root";
-  age.secrets.oink.group = config.systemd.services.oink.group or "root";
-  systemd.services.oink = {
-    serviceConfig.EnvironmentFile = config.age.secrets.oink.path;
-  };
+  age.secrets.oinkKeyFile.file = ../secrets/oinkKeyFile.age;
+  age.secrets.oinkKeyFile.owner = config.systemd.services.oink.user or "root";
+  age.secrets.oinkKeyFile.group = config.systemd.services.oink.group or "root";
+  age.secrets.oinkSecretKeyFile.file = ../secrets/oinkSecretKeyFile.age;
+  age.secrets.oinkSecretKeyFile.owner = config.systemd.services.oink.user or "root";
+  age.secrets.oinkSecretKeyFile.group = config.systemd.services.oink.group or "root";
 
   # I should really move the ddns and jellyfin stuff into their own files.
   environment.persistence."/persist" = {
@@ -107,6 +103,7 @@
 
   services.caddy = {
     enable = true;
+    package = pkgs.caddy;
     # acmeCA = "https://acme-staging-v02.api.letsencrypt.org/directory";
     globalConfig = ''
       debug

@@ -8,7 +8,11 @@ in
     jingliu
     bender
   ];
-  "oink.age".publicKeys = [
+  "oinkKeyFile.age".publicKeys = [
+    jingliu
+    bender
+  ];
+  "oinkSecretKeyFile.age".publicKeys = [
     jingliu
     bender
   ];

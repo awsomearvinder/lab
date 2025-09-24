@@ -38,15 +38,15 @@
     networkConfig.IPv6SendRA = true;
     networkConfig.DHCPPrefixDelegation = true;
     networkConfig.DNS = "10.120.0.1";
-    dhcpServerConfig.SendOption = "138:ipv4address:10.120.1.1";
+    dhcpServerConfig.SendOption = "138:ipv4address:10.120.0.1";
     dhcpServerConfig.EmitDNS = "yes";
-    dhcpServerConfig.DNS = "_server_address";
+    dhcpServerConfig.DNS = "10.120.0.1";
     dhcpPrefixDelegationConfig.SubnetId = 0;
   };
   systemd.network.networks."20-omada" = {
     matchConfig.Name = "eno4";
     addresses = [
-      { Address = "10.120.1.1/24"; }
+      { Address = "10.120.0.1/24"; }
       { Address = "fd8c:ac79:8818:1:/64"; }
     ];
     networkConfig.DHCP = false;
@@ -55,10 +55,10 @@
     networkConfig.ConfigureWithoutCarrier = true;
     networkConfig.IPv6SendRA = true;
     networkConfig.DHCPPrefixDelegation = true;
-    networkConfig.DNS = "10.120.1.1";
-    dhcpServerConfig.SendOption = "138:ipv4address:10.120.1.1";
+    networkConfig.DNS = "10.120.0.1";
+    dhcpServerConfig.SendOption = "138:ipv4address:10.120.0.1";
     dhcpServerConfig.EmitDNS = "yes";
-    dhcpServerConfig.DNS = "_server_address";
+    dhcpServerConfig.DNS = "10.120.0.1";
     dhcpPrefixDelegationConfig.SubnetId = 1;
   };
   virtualisation.oci-containers.containers.omada-sdn = {
@@ -71,13 +71,13 @@
       TZ = "America/Chicago";
     };
     ports = [
-      "10.120.1.1:8088:8088"
-      "10.120.1.1:8043:8043"
-      "10.120.1.1:8843:8843"
-      "10.120.1.1:19810:19810/udp"
-      "10.120.1.1:27001:27001/udp"
-      "10.120.1.1:29810:29810/udp"
-      "10.120.1.1:29811-29816:29811-29816"
+      "10.120.0.1:8088:8088"
+      "10.120.0.1:8043:8043"
+      "10.120.0.1:8843:8843"
+      "10.120.0.1:19810:19810/udp"
+      "10.120.0.1:27001:27001/udp"
+      "10.120.0.1:29810:29810/udp"
+      "10.120.0.1:29811-29816:29811-29816"
     ];
     volumes = [
       "/persist/omada-controller/data:/opt/tplink/EAPController/data"
@@ -86,7 +86,7 @@
   };
 
   services.caddy.virtualHosts."omada.jingliu.arvinderd.com".extraConfig = ''
-    reverse_proxy https://10.120.1.1:8043 {
+    reverse_proxy https://10.120.0.1:8043 {
       transport http {
         tls
         tls_insecure_skip_verify
@@ -200,7 +200,7 @@
     ];
   };
 
-  services.resolved.enable = false;
+  services.resolved.enable = true;
 
   services.adguardhome = {
     enable = true;
@@ -217,8 +217,7 @@
       dns = {
         bind_hosts = [
           # we block this using the fw, so we all good.
-          "0.0.0.0"
-          "::"
+          "10.120.0.1"
         ];
         port = 53;
       };

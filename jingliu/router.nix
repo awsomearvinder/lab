@@ -94,6 +94,29 @@
     }
   '';
 
+  systemd.network.netdevs."proxbr0" = {
+    netdevConfig = {
+      Name = "proxbr0";
+      Kind = "bridge";
+    };
+  };
+  systemd.network.networks."40-proxmox" = {
+    matchConfig.Name = "proxbr0";
+    addresses = [
+      { Address = "10.120.110.1/24"; }
+      { Address = "fd8c:ac79:8818:2:/64"; }
+    ];
+    networkConfig.DHCP = false;
+    networkConfig.DHCPServer = true;
+    networkConfig.IPv6AcceptRA = false;
+    networkConfig.ConfigureWithoutCarrier = true;
+    networkConfig.IPv6SendRA = true;
+    networkConfig.DHCPPrefixDelegation = true;
+    dhcpServerConfig.EmitDNS = "yes";
+    dhcpServerConfig.DNS = "10.120.0.1";
+    dhcpPrefixDelegationConfig.SubnetId = 3;
+  };
+
   environment.persistence."/persist".directories = [
     {
       directory = "/persist/omada-controller/data";
@@ -113,7 +136,7 @@
   networking.nftables.enable = true;
   networking.nftables.checkRuleset = true;
   networking.nftables.ruleset = ''
-    define INTERNAL = { "podman0", "eno3", "eno4" }
+    define INTERNAL = { "podman0", "eno3", "eno4", "proxbr0"}
     define WORLD = { "eno2" }
     table ip6 FW {
         chain FORWARD {
@@ -121,6 +144,7 @@
             ct state established,related accept
             ct state invalid counter drop
             iifname $INTERNAL oifname $WORLD  counter accept
+            iifname $INTERNAL oifname "proxbr0" counter accept
             meta l4proto ipv6-icmp counter accept
         }
         chain INCOMING {
@@ -155,6 +179,7 @@
             ct state invalid counter drop
             iifname $INTERNAL oifname $WORLD counter accept
             iifname $INTERNAL oifname "podman0" counter accept
+            iifname $INTERNAL oifname "proxbr0" counter accept
             meta l4proto icmp accept
             counter
     	 }
@@ -197,6 +222,7 @@
       "eno1"
       "eno3"
       "eno4"
+      "proxbr0"
     ];
   };
 

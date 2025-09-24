@@ -15,7 +15,7 @@
     ./hardware-configuration.nix
     ./applications/gitea.nix
     ./applications/jellyfin.nix
-    # ./proxmox.nix
+    ./proxmox.nix
     ./auth.nix
     ./incus.nix
     ./router.nix

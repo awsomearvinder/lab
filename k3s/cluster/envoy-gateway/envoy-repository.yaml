@@ -1,0 +1,13 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: envoy-gateway
+  namespace: envoy-system
+spec:
+  interval: 15m
+  url: oci://docker.io/envoyproxy/gateway-helm
+  layerSelector: # select the Helm chart layer
+    mediaType: "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
+    operation: copy
+  ref:
+    semver: "v1.6.1"

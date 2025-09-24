@@ -4,3 +4,4 @@ resources:
 - ./devns.yaml
 - ./metallb/flux-kustomization.yaml
 - ./storage
+- ./envoy-gateway

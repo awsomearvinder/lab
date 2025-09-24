@@ -1,0 +1,39 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: metallb-system
+  namespace: flux-system
+spec:
+  interval: 15m
+  prune: true
+  timeout: 2m
+  path: ./k3s/cluster/metallb/metallb
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: metallb-controller
+      namespace: metallb-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: metallb-system-config
+  namespace: flux-system
+spec:
+  interval: 15m
+  prune: true
+  timeout: 2m
+  dependsOn:
+    - name: metallb-system
+  path: ./k3s/cluster/metallb/metallb-config
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: metallb-controller
+      namespace: metallb-system

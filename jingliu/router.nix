@@ -114,6 +114,8 @@
     networkConfig.DHCPPrefixDelegation = true;
     dhcpServerConfig.EmitDNS = "yes";
     dhcpServerConfig.DNS = "10.120.0.1";
+    dhcpServerConfig.PoolOffset = 0;
+    dhcpServerConfig.PoolSize = 100;
     dhcpPrefixDelegationConfig.SubnetId = 3;
   };
 

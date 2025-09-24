@@ -14,10 +14,17 @@
       ldaps_options.cert_file = "/run/credentials/lldap.service/cert.pem";
       ldaps_options.key_file = "/run/credentials/lldap.service/key.pem";
       # TODO: SMTP
+      smtp_options.server = "smtp.fastmail.com";
+      smtp_options.port = 465;
+      smtp_options.smtp_encryption = "TLS";
+      smtp_options.from = "LLDAP <lldap@mail.arvinderd.com>";
+      smtp_options.enable_password_reset = true;
     };
     environment = {
+      # this is overwrote in the environmentFile
       LLDAP_LDAP_USER_PASS_FILE = "/run/credentials/lldap.service/lldap_admin_pass";
     };
+    environmentFile = "${config.age.secrets.lldap_env.path}";
   };
 
   security.acme.acceptTerms = true;
@@ -53,6 +60,8 @@
   }";
   age.secrets.lldap_admin_pass.group = "${config.systemd.services.lldap.serviceConfig.Group or "root"
   }";
+  age.secrets.lldap_env.file = ../secrets/lldap-env.age;
+
   services.caddy.virtualHosts."https://lldap.jingliu.arvinderd.com" = {
     extraConfig = ''
       reverse_proxy http://127.0.0.1:17170 {

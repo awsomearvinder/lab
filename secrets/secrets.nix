@@ -24,4 +24,8 @@ in
     bender
     jingliu
   ];
+  "lldap-env.age".publicKeys = [
+    bender
+    jingliu
+  ];
 }

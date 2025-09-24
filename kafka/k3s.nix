@@ -8,5 +8,7 @@
   services.k3s.extraFlags = toString [
     "--debug"
     "--tls-san kafka.arvinderd.com"
+    "--disable servicelb"
+    "--disable traefik"
   ];
 }

@@ -21,4 +21,6 @@ spec:
     kind: OCIRepository
     name: kube-prometheus-stack
     namespace: dev
-
+  valuesFrom:
+    - kind: ConfigMap
+      name: prometheus-values

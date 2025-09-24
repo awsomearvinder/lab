@@ -784,7 +784,7 @@ data:
 
         ## Service type
         ##
-        type: LoadBalancer
+        type: ClusterIP
 
       ## Configuration for creating a separate Service for each statefulset Alertmanager replica
       ##
@@ -814,7 +814,7 @@ data:
 
         ## Service type
         ##
-        type: LoadBalancer
+        type: ClusterIP
 
       ## Configuration for creating a ServiceMonitor for AlertManager
       ##
@@ -1232,6 +1232,25 @@ data:
     grafana:
       enabled: true
       namespaceOverride: ""
+
+      route:
+        main:
+          enabled: true
+          apiVersion: gateway.networking.k8s.io/v1
+          kind: HTTPRoute
+          annotations: {}
+          labels: {}
+          hostnames:
+            - grafana.kafka.arvinderd.com
+          parentRefs:
+            - name: eg
+              namespace: envoy-system
+          matches:
+            - path:
+              type: PathPrefix
+              value: /
+          filters: []
+          additionalRules: []
 
       ## ForceDeployDatasources Create datasource configmap even if grafana deployment has been disabled
       ##
@@ -2753,7 +2772,7 @@ data:
             ## Service type
             ## NodePort, ClusterIP, LoadBalancer
             ##
-            type: LoadBalancer
+            type: ClusterIP
 
             ## List of IP addresses at which the Prometheus server service is available
             ## Ref: https://kubernetes.io/docs/concepts/services-networking/service/#external-ips
@@ -3066,7 +3085,7 @@ data:
       ## Service type
       ## NodePort, ClusterIP, LoadBalancer
       ##
-        type: LoadBalancer
+        type: ClusterIP
 
         ## List of IP addresses at which the Prometheus server service is available
         ## Ref: https://kubernetes.io/docs/concepts/services-networking/service/#external-ips
@@ -3440,7 +3459,7 @@ data:
 
         ## Service type
         ##
-        type: LoadBalancer
+        type: ClusterIP
 
         ## Service dual stack
         ##
@@ -3518,7 +3537,7 @@ data:
 
         ## Service type
         ##
-        type: LoadBalancer
+        type: ClusterIP
 
         ## Port to expose on each node
         ##
@@ -3569,7 +3588,7 @@ data:
 
         ## Service type
         ##
-        type: LoadBalancer
+        type: ClusterIP
 
         ## Additional ports to open for Prometheus service
         ##
@@ -3626,7 +3645,7 @@ data:
 
         ## Service type
         ##
-        type: LoadBalancer
+        type: ClusterIP
 
         ## Service dual stack
         ##
@@ -3748,8 +3767,8 @@ data:
           annotations: {}
           labels: {}
 
-          hostnames: []
-          # - my-filter.example.com
+          hostnames:
+           - prometheus.kafka.arvinderd.com
           parentRefs: []
           # - name: acme-gw
 
@@ -5012,7 +5031,7 @@ data:
 
         ## Service type
         ##
-        type: LoadBalancer
+        type: ClusterIP
 
       ## Configuration for creating a ServiceMonitor for the ThanosRuler service
       ##

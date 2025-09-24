@@ -14,6 +14,7 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ./applications/gitea.nix
+    ./applications/jellyfin.nix
     # ./proxmox.nix
     ./auth.nix
     ./incus.nix
@@ -91,30 +92,6 @@
         user = "caddy";
         group = "caddy";
       }
-      {
-        directory = "/var/lib/jellyfin/config";
-        user = "jellyfin";
-        group = "jellyfin";
-        mode = "0755";
-      }
-      {
-        directory = "/var/lib/jellyfin/cache";
-        user = "jellyfin";
-        group = "jellyfin";
-        mode = "0755";
-      }
-      {
-        directory = "/var/lib/jellyfin/media";
-        user = "jellyfin";
-        group = "jellyfin";
-        mode = "0755";
-      }
-      {
-        directory = "/var/lib/jellyfin/data";
-        user = "jellyfin";
-        group = "jellyfin";
-        mode = "0755";
-      }
       "/etc/nixos"
       {
         directory = "/etc/ssh";
@@ -125,25 +102,7 @@
     ];
     files = [
       "/etc/machine-id"
-      "/var/lib/jellyfin/web-config.json"
     ];
-  };
-
-  services.jellyfin = {
-    enable = true;
-    dataDir = "/var/lib/jellyfin/data";
-    cacheDir = "/var/lib/jellyfin/cache";
-    configDir = "/var/lib/jellyfin/config";
-  };
-
-  users.users.jellyfin = {
-    # isNormalUser = true;
-    uid = 100001;
-    group = "jellyfin";
-    extraGroups = [ "video" ];
-  };
-  users.groups.jellyfin = {
-    gid = 100001;
   };
 
   services.caddy = {
@@ -151,10 +110,6 @@
     # acmeCA = "https://acme-staging-v02.api.letsencrypt.org/directory";
     globalConfig = ''
       debug
-    '';
-    virtualHosts."video.jingliu.arvinderd.com".extraConfig = ''
-      reverse_proxy http://[::1]:8096 {
-      }
     '';
     #   virtualHosts."testing.arvinderd.com".extraConfig = ''
     #     	# define forward auth for any path under `/`, if not more specific defined

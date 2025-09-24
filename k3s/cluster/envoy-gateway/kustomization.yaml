@@ -4,3 +4,4 @@ resources:
 - ./envoy-repository.yaml
 - ./envoyns.yaml
 - ./envoy-chart.yaml
+- ./quickstart.yaml

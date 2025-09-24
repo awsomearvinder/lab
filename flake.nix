@@ -60,5 +60,11 @@
             )
           ];
         };
+      nixosConfigurations.kafka = nixpkgs.lib.nixosSystem {
+        modules = [
+          ./kafka/configuration.nix
+          agenix.nixosModules.default
+        ];
+      };
     };
 }

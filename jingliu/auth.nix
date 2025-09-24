@@ -88,6 +88,12 @@
     settings.LDAP_ATTRIBUTE_GROUP_NAME = "cn";
     settings.LDAP_ATTRIBUTE_ADMIN_GROUP = "pocket_admin";
     settings.UI_CONFIG_DISABLED = true;
+    settings.SMTP_HOST = "smtp.fastmail.com";
+    settings.SMTP_PORT = 465;
+    settings.SMTP_FROM = "pocketid@mail.arvinderd.com";
+    settings.SMTP_TLS = "tls";
+    settings.EMAIL_ONE_TIME_ACCESS_AS_ADMIN_ENABLED = true;
+    settings.EMAIL_ONE_TIME_ACCESS_AS_UNAUTHENTICATED_ENABLED = true;
     # settings.LDAP_BIND_PASSWORD_FILE doesn't work because agenix likes to create a '\n' at EOF
     # on decryption, and pocket-id sends that over to LDAP in authentication, lol.
     environmentFile = "${config.age.secrets.pocket_ldap_password.path}";

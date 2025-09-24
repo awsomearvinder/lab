@@ -6,7 +6,11 @@
     preseed = {
       config = {
         "core.https_address" = "[::1]:9030";
+        "core.https_trusted_proxy" = "[::1]";
         "images.auto_update_interval" = 6;
+        "oidc.client.id" = "2ebb0267-64ea-4b4d-8512-b71faf7fb771";
+        "oidc.issuer" = "https://oidc.jingliu.arvinderd.com";
+        "oidc.scopes" = "openid,profile,email";
       };
       networks = [
         {

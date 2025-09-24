@@ -10,8 +10,9 @@
       http_url = "https://lldap.jingliu.arvinderd.com";
       database_url = "sqlite://./lldap.db?mode=rwc";
       verbose = true;
-      # TODO: Get a cert on here for it...
-      # ldaps_options.enabled = true;
+      ldaps_options.enabled = true;
+      ldaps_options.cert_file = "/run/credentials/lldap.service/cert.pem";
+      ldaps_options.key_file = "/run/credentials/lldap.service/key.pem";
       # TODO: SMTP
     };
     environment = {
@@ -19,8 +20,18 @@
     };
   };
 
-  systemd.services.lldap.serviceConfig.LoadCredential =
-    "lldap_admin_pass:${config.age.secrets.lldap_admin_pass.path}";
+  security.acme.acceptTerms = true;
+  security.acme.certs."lldap.jingliu.arvinderd.com" = {
+    reloadServices = [ "lldap" ];
+  };
+  security.acme.defaults.listenHTTP = ":9063";
+  security.acme.defaults.email = "lab@mail.arvinderd.com";
+
+  systemd.services.lldap.serviceConfig.LoadCredential = [
+    "lldap_admin_pass:${config.age.secrets.lldap_admin_pass.path}"
+    "cert.pem:${config.security.acme.certs."lldap.jingliu.arvinderd.com".directory}/cert.pem"
+    "key.pem:${config.security.acme.certs."lldap.jingliu.arvinderd.com".directory}/key.pem"
+  ];
 
   system.activationScripts."createPersistentStorageDirs".deps = [
     "var-lib-private-permissions"
@@ -42,9 +53,16 @@
   }";
   age.secrets.lldap_admin_pass.group = "${config.systemd.services.lldap.serviceConfig.Group or "root"
   }";
-  services.caddy.virtualHosts."lldap.jingliu.arvinderd.com" = {
+  services.caddy.virtualHosts."https://lldap.jingliu.arvinderd.com" = {
     extraConfig = ''
       reverse_proxy http://127.0.0.1:17170 {
+        
+      }
+    '';
+  };
+  services.caddy.virtualHosts."http://lldap.jingliu.arvinderd.com" = {
+    extraConfig = ''
+      reverse_proxy http://127.0.0.1:9063 {
         
       }
     '';
@@ -57,7 +75,7 @@
     settings.UNIX_SOCKET = "/run/${config.systemd.services.pocket-id.serviceConfig.RuntimeDirectory}/pocket.sock";
     settings.UNIX_SOCKET_MODE = "0766";
     settings.LDAP_ENABLED = true;
-    settings.LDAP_URL = "ldap://lldap.jingliu.arvinderd.com:3890";
+    settings.LDAP_URL = "ldaps://lldap.jingliu.arvinderd.com:6360";
     settings.LDAP_BIND_DN = "cn=pocketid,ou=people,dc=arvinderd,dc=com";
     settings.LDAP_BASE = "dc=arvinderd,dc=com";
     settings.LDAP_ATTRIBUTE_USER_UNIQUE_IDENTIFIER = "uuid";
@@ -101,6 +119,11 @@
       mode = "0700";
       user = config.services.pocket-id.user;
       group = config.services.pocket-id.group;
+    }
+    {
+      directory = "/var/lib/acme";
+      user = "acme";
+      mode = "0700";
     }
   ];
 }

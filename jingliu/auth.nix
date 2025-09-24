@@ -10,6 +10,7 @@
       http_url = "https://lldap.jingliu.arvinderd.com";
       database_url = "sqlite://./lldap.db?mode=rwc";
       verbose = true;
+      force_ldap_user_pass_reset = "always";
       ldaps_options.enabled = true;
       ldaps_options.cert_file = "/run/credentials/lldap.service/cert.pem";
       ldaps_options.key_file = "/run/credentials/lldap.service/key.pem";

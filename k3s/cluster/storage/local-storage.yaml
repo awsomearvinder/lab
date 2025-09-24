@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: local-storage-provisioner
   namespace: storage-system
+  labels:
+    reconcile.fluxcd.io/watch: Enabled
 spec:
   chart:
     spec:
@@ -13,11 +15,14 @@ spec:
         name: local-storage-provisioner
         namespace: storage-system
   values:
-    storageClass.defaultClass: true
-    storageClass.defaultVolumeType: local
-    storageClass.nodePathMap:
+    storageClass:
+      create: true
+      reclaimPolicy: Delete
+      defaultClass: true
+      defaultVolumeType: local
+      pathPattern: "{{ .PVC.Namespace }}/{{ .PVC.Name }}/"
+    nodePathMap:
       - {"node": "DEFAULT_PATH_FOR_NON_LISTED_NODES", "paths": ["/persist/k3s/data"] }
-    storageClass.pathPattern: "{{ .PVC.Namespace }}/{{ .PVC.Name }}"
   interval: 15m
   timeout: 5m
   releaseName: local-path-storage

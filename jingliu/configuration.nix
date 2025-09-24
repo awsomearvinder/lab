@@ -19,6 +19,7 @@
     ./auth.nix
     ./incus.nix
     ./router.nix
+    ../lib/base.nix
   ];
 
   # Use the GRUB 2 boot loader.
@@ -51,29 +52,6 @@
     "root"
     "@wheel"
   ];
-
-  services.oink = {
-    enable = true;
-    domains = [
-      {
-        domain = "arvinderd.com";
-        subdomain = "jingliu";
-      }
-      {
-        domain = "arvinderd.com";
-        subdomain = "*.jingliu";
-      }
-    ];
-    apiKeyFile = config.age.secrets.oinkKeyFile.path;
-    secretApiKeyFile = config.age.secrets.oinkSecretKeyFile.path;
-  };
-
-  age.secrets.oinkKeyFile.file = ../secrets/oinkKeyFile.age;
-  age.secrets.oinkKeyFile.owner = config.systemd.services.oink.user or "root";
-  age.secrets.oinkKeyFile.group = config.systemd.services.oink.group or "root";
-  age.secrets.oinkSecretKeyFile.file = ../secrets/oinkSecretKeyFile.age;
-  age.secrets.oinkSecretKeyFile.owner = config.systemd.services.oink.user or "root";
-  age.secrets.oinkSecretKeyFile.group = config.systemd.services.oink.group or "root";
 
   # I should really move the ddns and jellyfin stuff into their own files.
   environment.persistence."/persist" = {

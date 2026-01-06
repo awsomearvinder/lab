@@ -11,7 +11,7 @@ spec:
     branch: master
   secretRef:
     name: flux-system
-  url: https://github.com/awsomearvinder/lab.git
+  url: ssh://git@github.com/awsomearvinder/lab
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization

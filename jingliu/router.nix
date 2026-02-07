@@ -147,6 +147,7 @@
             ct state invalid counter drop
             iifname $INTERNAL oifname $WORLD  counter accept
             iifname $INTERNAL oifname "proxbr0" counter accept
+            iifname $WORLD oifname "proxbr0" meta l4proto { tcp, udp } th dport { 443, 80 } counter accept
             meta l4proto ipv6-icmp counter accept
         }
         chain INCOMING {

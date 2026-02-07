@@ -17,7 +17,6 @@
     ./applications/jellyfin.nix
     ./proxmox.nix
     ./auth.nix
-    ./incus.nix
     ./router.nix
     ./applications/vikunja.nix
     ./applications/actual.nix

@@ -82,6 +82,15 @@
     ];
   };
 
+  users.users.gha = {
+    isNormalUser = true;
+    group = "gha";
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFp7d6/DppVdXrjVkclGQGwCWhLsDmB7ju1wcE7FG7IL"
+    ];
+  };
+  users.groups.gha = { };
+
   services.caddy = {
     enable = true;
     package = pkgs.caddy;

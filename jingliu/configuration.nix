@@ -20,6 +20,7 @@
     ./incus.nix
     ./router.nix
     ./applications/vikunja.nix
+    ./applications/actual.nix
     ../lib/base.nix
   ];
 

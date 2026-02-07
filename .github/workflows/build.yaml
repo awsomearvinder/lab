@@ -1,5 +1,6 @@
 on:
-  pull_request: {}
+  pull_request:
+      types: [opened, synchronize, reopened]
   push: {}
 jobs:
   build-pr:

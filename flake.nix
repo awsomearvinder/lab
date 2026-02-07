@@ -55,7 +55,9 @@
             (
               { pkgs, lib, ... }:
               {
-                nixpkgs.overlays = [ proxmox-nixos.overlays.${system} ];
+                nixpkgs.overlays = [
+                  proxmox-nixos.overlays.${system}
+                ];
               }
             )
           ];

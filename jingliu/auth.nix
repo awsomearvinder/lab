@@ -96,7 +96,7 @@
     settings.LDAP_ATTRIBUTE_USER_PROFILE_PICTURE = "avatar";
     settings.LDAP_ATTRIBUTE_GROUP_UNIQUE_IDENTIFIER = "uuid";
     settings.LDAP_ATTRIBUTE_GROUP_NAME = "cn";
-    settings.LDAP_ATTRIBUTE_ADMIN_GROUP = "pocket_admin";
+    settings.LDAP_ADMIN_GROUP_NAME = "pocket_admin";
     settings.UI_CONFIG_DISABLED = true;
     settings.SMTP_HOST = "smtp.fastmail.com";
     settings.SMTP_PORT = 465;

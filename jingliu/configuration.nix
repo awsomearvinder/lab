@@ -19,6 +19,7 @@
     ./auth.nix
     ./incus.nix
     ./router.nix
+    ./applications/vikunja.nix
     ../lib/base.nix
   ];
 

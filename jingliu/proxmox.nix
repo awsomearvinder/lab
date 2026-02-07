@@ -1,4 +1,4 @@
-{ ... }:
+{ lib, ... }:
 {
   environment.persistence."/persist".directories = [
     "/var/lib/pve-cluster"
@@ -6,6 +6,12 @@
   services.proxmox-ve = {
     enable = true;
     ipAddress = "2601:447:d17f:7ae1:42a8:f0ff:fe23:c8e8";
+  };
+  services.openssh = {
+    settings.AcceptEnv = lib.mkForce [
+      "LANG"
+      "LC_*"
+    ];
   };
   services.caddy = {
     virtualHosts."proxmox.jingliu.arvinderd.com".extraConfig = ''

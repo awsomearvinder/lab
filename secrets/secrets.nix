@@ -27,11 +27,19 @@ in
     bender
     jingliu
   ];
+  "vikunjaSecrets.age".publicKeys = [
+    bender
+    jingliu
+  ];
   "pocket-ldap-password.age".publicKeys = [
     bender
     jingliu
   ];
   "lldap-env.age".publicKeys = [
+    bender
+    jingliu
+  ];
+  "actual-secret.age".publicKeys = [
     bender
     jingliu
   ];

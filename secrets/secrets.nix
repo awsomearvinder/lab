@@ -31,6 +31,10 @@ in
     bender
     jingliu
   ];
+  "paperless.env.age".publicKeys = [
+    bender
+    jingliu
+  ];
   "pocket-ldap-password.age".publicKeys = [
     bender
     jingliu

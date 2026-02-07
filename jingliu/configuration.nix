@@ -21,6 +21,7 @@
     ./router.nix
     ./applications/vikunja.nix
     ./applications/actual.nix
+    ./applications/paperless.nix
     ../lib/base.nix
   ];
 

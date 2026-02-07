@@ -46,7 +46,7 @@
   systemd.network.networks."20-omada" = {
     matchConfig.Name = "eno4";
     addresses = [
-      { Address = "10.120.0.1/24"; }
+      { Address = "10.120.1.1/24"; }
       { Address = "fd8c:ac79:8818:1:/64"; }
     ];
     networkConfig.DHCP = false;

@@ -104,6 +104,7 @@
     matchConfig.Name = "proxbr0";
     addresses = [
       { Address = "10.120.110.1/24"; }
+      { Address = "10.42.0.0/16"; } # k3s
       { Address = "fd8c:ac79:8818:2:/64"; }
     ];
     networkConfig.DHCP = false;

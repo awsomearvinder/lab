@@ -1,0 +1,22 @@
+on:
+  schedule:
+    - cron: "0 16 * * 5"
+  workflow_dispatch: {}
+jobs:
+  bump-flake-and-pr:
+    name: "bump flake and pr"
+    runs-on: "ubuntu-latest"
+    steps:
+        - uses: "actions/checkout@v6"
+        - uses: "DeterminateSystems/determinate-nix-action@v3"
+        - name: "update flake"
+          run: "nix flake update"
+        - name: "make PR"
+          uses: "peter-evans/create-pull-request@v8"
+          with:
+            base: "master"
+            brancH: "${{ github.sha }}-flake-bump1"
+            commit-message: "chore(flake.lock): bump flake.lock"
+    permissions:
+      contents: "write"
+      pull-requests: "write"

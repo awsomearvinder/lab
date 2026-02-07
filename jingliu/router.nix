@@ -199,6 +199,8 @@
           iifname $INTERNAL tcp dport { 53 } accept
           iifname $INTERNAL udp dport { 53 } accept
 
+          tcp dport { 8088, 8043, 8843, 29811-29817 } accept
+          udp dport { 19810, 27001, 29810, 29811-29817 } accept
           udp dport 67 accept
           meta l4proto icmp accept
           ct state established,related accept

@@ -14,45 +14,52 @@
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
 
-  hardware.raid.HPSmartArray.enable = true;
-
   boot.initrd.availableKernelModules = [
-    "ehci_pci"
-    "ata_piix"
-    "uhci_hcd"
-    "hpsa"
+    "xhci_pci"
+    "ahci"
+    "nvme"
     "usbhid"
+    "usb_storage"
     "sd_mod"
   ];
   boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [ "kvm-intel" ];
+  boot.kernelModules = [ "kvm-amd" ];
   boot.extraModulePackages = [ ];
 
   fileSystems."/" = {
-    device = "none";
-    fsType = "tmpfs";
+    device = "/dev/disk/by-uuid/3b34a60f-d812-4986-b2a0-ce5eb0a258aa";
+    fsType = "btrfs";
     options = [
-      "size=8G"
-      "mode=755"
+      "subvol=root"
+      "compress=zstd"
+    ];
+  };
+
+  fileSystems."/nix" = {
+    device = "/dev/disk/by-uuid/3b34a60f-d812-4986-b2a0-ce5eb0a258aa";
+    fsType = "btrfs";
+    options = [
+      "subvol=nix"
+      "compress=zstd"
+    ];
+  };
+
+  fileSystems."/home" = {
+    device = "/dev/disk/by-uuid/3b34a60f-d812-4986-b2a0-ce5eb0a258aa";
+    fsType = "btrfs";
+    options = [
+      "subvol=home"
+      "compress=zstd"
     ];
   };
 
   fileSystems."/boot" = {
-    device = "/dev/disk/by-uuid/9d52eec0-a28e-4850-a601-510281d3713e";
-    fsType = "ext4";
-  };
-
-  fileSystems."/nix" = {
-    device = "/dev/disk/by-uuid/d40518f4-57df-420a-9e3e-18fec9808588";
-    fsType = "btrfs";
-    options = [ "compress=zstd" ];
-  };
-
-  fileSystems."/persist" = {
-    device = "/dev/disk/by-uuid/46060026-67c5-4440-97b2-762a19ce4645";
-    fsType = "btrfs";
-    options = [ "compress=zstd" ];
-    neededForBoot = true;
+    device = "/dev/disk/by-uuid/A8E0-AA4F";
+    fsType = "vfat";
+    options = [
+      "fmask=0022"
+      "dmask=0022"
+    ];
   };
 
   swapDevices = [ ];
@@ -62,13 +69,9 @@
   # still possible to use this option, but it's recommended to use it in conjunction
   # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
   networking.useDHCP = lib.mkDefault true;
-  # networking.interfaces.eno1.useDHCP = lib.mkDefault true;
-  # networking.interfaces.eno2.useDHCP = lib.mkDefault true;
-  # networking.interfaces.eno3.useDHCP = lib.mkDefault true;
-  # networking.interfaces.eno4.useDHCP = lib.mkDefault true;
+  # networking.interfaces.enp7s0.useDHCP = lib.mkDefault true;
+  # networking.interfaces.wlp6s0.useDHCP = lib.mkDefault true;
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-  hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-  boot.swraid.enable = true;
-
+  hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }

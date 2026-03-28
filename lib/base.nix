@@ -12,6 +12,8 @@
   services.openssh.enable = true;
   services.openssh.settings.PermitRootLogin = "prohibit-password";
 
+  networking.nftables.enable = true;
+
   # Open ssh in the firewall.
   networking.firewall.allowedTCPPorts = [ 22 ];
 }

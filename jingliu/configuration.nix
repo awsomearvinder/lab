@@ -3,8 +3,6 @@
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
 {
-  config,
-  lib,
   pkgs,
   ...
 }:
@@ -13,14 +11,14 @@
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ./applications/gitea.nix
-    ./applications/jellyfin.nix
-    ./proxmox.nix
-    ./auth.nix
+    # ./applications/gitea.nix
+    # ./applications/jellyfin.nix
+    # ./proxmox.nix
+    # ./auth.nix
     ./router.nix
-    ./applications/vikunja.nix
-    ./applications/actual.nix
-    ./applications/paperless.nix
+    # ./applications/vikunja.nix
+    # ./applications/actual.nix
+    # ./applications/paperless.nix
     ../lib/base.nix
   ];
 
@@ -63,11 +61,6 @@
       "/var/log"
       "/var/lib/nixos"
       "/var/lib/systemd/coredump"
-      {
-        directory = "/var/lib/caddy";
-        user = "caddy";
-        group = "caddy";
-      }
       "/etc/nixos"
       {
         directory = "/etc/ssh";
@@ -97,24 +90,6 @@
     globalConfig = ''
       debug
     '';
-    #   virtualHosts."testing.arvinderd.com".extraConfig = ''
-    #     	# define forward auth for any path under `/`, if not more specific defined
-    #     	forward_auth / http://127.0.0.1:8098 {
-    #     		uri /oauth2/auth
-    #     		copy_headers Authorization X-Auth-Request-User X-Auth-Request-Email
-    #     		@error status 401
-    #     		handle_response @error {
-    #     			redir https://oauth2proxy.arvinderd.com/oauth2/sign_in?rd={http.request.scheme}://{http.request.host}/{http.request.uri}
-    #     		}
-    #     	}
-
-    #     	# define `/oauth2/*` as specific endpoint, to avoid forward auth protection to be able to use service
-    #     	reverse_proxy /oauth2/* http://127.0.0.1:8098 {
-    #     	}
-
-    #       root * /var/www/html
-    #       file_server browse
-    #   '';
   };
 
   # Configure keymap in X11
@@ -140,7 +115,6 @@
     isNormalUser = true;
     extraGroups = [
       "wheel"
-      "jellyfin"
     ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
       helix
@@ -168,14 +142,6 @@
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
 
-  # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [
-    22
-    80
-    443
-    5800
-  ];
-  networking.firewall.allowedUDPPorts = [ 443 ];
   # networking.firewall.interfaces."podman-+".allowedUDPPorts = [ 53 ];
   # networking.tempAddresses = "disabled";
 

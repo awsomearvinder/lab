@@ -13,16 +13,32 @@
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ./k3s.nix
-    ./caddy.nix
+    ./applications/caddy.nix
+    ./applications/incus.nix
+    ./applications/auth.nix
     ../lib/base.nix
   ];
 
+  nix.settings.trusted-users = [
+    "root"
+    "@wheel"
+  ];
+
+  systemd.network.enable = true;
+  networking.useDHCP = false;
+  networking.hostName = "herta";
+  systemd.network.networks."10-lan" = {
+    matchConfig.Name = "enp7s0";
+    networkConfig.DHCP = false;
+    networkConfig.Address = "10.120.0.101/24";
+    networkConfig.DNS = "10.120.0.1";
+    networkConfig.Gateway = "10.120.0.1";
+    networkConfig.IPv6PrivacyExtensions = false;
+  };
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  networking.hostName = "kafka"; # Define your hostname.
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   # networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
@@ -42,13 +58,6 @@
   #   useXkbConfig = true; # use xkb.options in tty.
   # };
 
-  # Enable the X11 windowing system.
-  # services.xserver.enable = true;
-
-  users.users.root.openssh.authorizedKeys.keys = [
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILNQHSuX71ZhzbtkBZV4RCHBdfZ+JUIR1hKfB9gRzlDE"
-  ];
-
   # Configure keymap in X11
   # services.xserver.xkb.layout = "us";
   # services.xserver.xkb.options = "eurosign:e,caps:escape";
@@ -64,8 +73,14 @@
   #   pulse.enable = true;
   # };
 
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.libinput.enable = true;
+  users.users.bender = {
+    isNormalUser = true;
+    extraGroups = [ "wheel" ];
+    hashedPassword = "$y$j9T$Q51zv98zHEh5FBoHWIHrP/$vLFmEOVfHlKgqdJasXDKFG7fLZGzTr.lt.q1m/ha5o4";
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILNQHSuX71ZhzbtkBZV4RCHBdfZ+JUIR1hKfB9gRzlDE bender@desktop"
+    ];
+  };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   # users.users.alice = {
@@ -80,10 +95,11 @@
 
   # List packages installed in system profile.
   # You can use https://search.nixos.org/ to find more packages (and options).
-  # environment.systemPackages = with pkgs; [
-  #   vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #   wget
-  # ];
+  environment.systemPackages = with pkgs; [
+    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    helix
+    ripgrep
+  ];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -95,11 +111,11 @@
 
   # List services that you want to enable:
 
+  # Enable the OpenSSH daemon.
+  services.openssh.enable = true;
+
   # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [
-    22
-    3000
-  ];
+  # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
@@ -126,5 +142,5 @@
   # and migrated your data accordingly.
   #
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
-  system.stateVersion = "25.11"; # Did you read the comment?
+  system.stateVersion = "26.05"; # Did you read the comment?
 }

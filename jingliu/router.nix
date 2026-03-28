@@ -1,6 +1,5 @@
 {
   pkgs,
-  config,
   lib,
   ...
 }:
@@ -37,10 +36,12 @@
     networkConfig.ConfigureWithoutCarrier = true;
     networkConfig.IPv6SendRA = true;
     networkConfig.DHCPPrefixDelegation = true;
-    networkConfig.DNS = "10.120.0.1";
+    networkConfig.DNS = "1.1.1.1";
     dhcpServerConfig.SendOption = "138:ipv4address:10.120.0.1";
     dhcpServerConfig.EmitDNS = "yes";
     dhcpServerConfig.DNS = "10.120.0.1";
+    # 1-100 is reserved.
+    dhcpServerConfig.PoolSize = 99;
     dhcpPrefixDelegationConfig.SubnetId = 0;
   };
   systemd.network.networks."20-omada" = {
@@ -55,7 +56,7 @@
     networkConfig.ConfigureWithoutCarrier = true;
     networkConfig.IPv6SendRA = true;
     networkConfig.DHCPPrefixDelegation = true;
-    networkConfig.DNS = "10.120.0.1";
+    networkConfig.DNS = "1.1.1.1";
     dhcpServerConfig.SendOption = "138:ipv4address:10.120.0.1";
     dhcpServerConfig.EmitDNS = "yes";
     dhcpServerConfig.DNS = "10.120.0.1";
@@ -94,32 +95,6 @@
     }
   '';
 
-  systemd.network.netdevs."proxbr0" = {
-    netdevConfig = {
-      Name = "proxbr0";
-      Kind = "bridge";
-    };
-  };
-  systemd.network.networks."40-proxmox" = {
-    matchConfig.Name = "proxbr0";
-    addresses = [
-      { Address = "10.120.110.1/24"; }
-      { Address = "10.42.0.0/16"; } # k3s
-      { Address = "fd8c:ac79:8818:2:/64"; }
-    ];
-    networkConfig.DHCP = false;
-    networkConfig.DHCPServer = true;
-    networkConfig.IPv6AcceptRA = false;
-    networkConfig.ConfigureWithoutCarrier = true;
-    networkConfig.IPv6SendRA = true;
-    networkConfig.DHCPPrefixDelegation = true;
-    dhcpServerConfig.EmitDNS = "yes";
-    dhcpServerConfig.DNS = "10.120.0.1";
-    dhcpServerConfig.PoolOffset = 0;
-    dhcpServerConfig.PoolSize = 100;
-    dhcpPrefixDelegationConfig.SubnetId = 3;
-  };
-
   environment.persistence."/persist".directories = [
     {
       directory = "/persist/omada-controller/data";
@@ -139,7 +114,8 @@
   networking.nftables.enable = true;
   networking.nftables.checkRuleset = true;
   networking.nftables.ruleset = ''
-    define INTERNAL = { "podman0", "eno3", "eno4", "proxbr0"}
+    define INTERNAL = { "podman0", "eno3", "eno4" }
+    define HERTA = "2601:447:ce80:4020:3256:fff:fe20:8f18"
     define WORLD = { "eno2" }
     table ip6 FW {
         chain FORWARD {
@@ -147,8 +123,7 @@
             ct state established,related accept
             ct state invalid counter drop
             iifname $INTERNAL oifname $WORLD  counter accept
-            iifname $INTERNAL oifname "proxbr0" counter accept
-            iifname $WORLD oifname "proxbr0" meta l4proto { tcp, udp } th dport { 443, 80 } counter accept
+            ip6 daddr $HERTA counter accept
             meta l4proto ipv6-icmp counter accept
         }
         chain INCOMING {
@@ -183,30 +158,24 @@
             ct state invalid counter drop
             iifname $INTERNAL oifname $WORLD counter accept
             iifname $INTERNAL oifname "podman0" counter accept
-            iifname $INTERNAL oifname "proxbr0" counter accept
+            ip daddr 10.120.0.101 accept
             meta l4proto icmp accept
             counter
     	 }
       chain INCOMING {
           type filter hook input priority filter; policy drop;
-          tcp dport 22 accept
-
+          ct state established,related accept
+          ct state invalid counter drop
           meta iifname "lo" accept
-
-          # LDAP
-          iifname $INTERNAL tcp dport { 6360, 3890 } accept
-          tcp dport { 80, 443 } accept
 
           # DNS
           iifname $INTERNAL tcp dport { 53 } accept
           iifname $INTERNAL udp dport { 53 } accept
 
-          tcp dport { 8088, 8043, 8843, 29811-29817 } accept
+          tcp dport { 8088, 8043, 8843, 29810, 29811-29817 } accept
           udp dport { 19810, 27001, 29810, 29811-29817 } accept
           udp dport 67 accept
           meta l4proto icmp accept
-          ct state established,related accept
-          ct state invalid counter drop
           counter
       }
       chain OUTGOING {
@@ -223,12 +192,28 @@
 
   networking.nat = {
     enable = true;
+    forwardPorts = [
+      {
+        destination = "10.120.0.101:80";
+        proto = "tcp";
+        sourcePort = 80;
+      }
+      {
+        destination = "10.120.0.101:443";
+        proto = "tcp";
+        sourcePort = 443;
+      }
+      {
+        destination = "10.120.0.101:443";
+        proto = "udp";
+        sourcePort = 443;
+      }
+    ];
     externalInterface = "eno2";
     internalInterfaces = [
       "eno1"
       "eno3"
       "eno4"
-      "proxbr0"
     ];
   };
 

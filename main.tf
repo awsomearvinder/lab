@@ -1,0 +1,3 @@
+module "tf" {
+  source = "./tf"
+}

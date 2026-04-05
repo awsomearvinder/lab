@@ -26,6 +26,8 @@
 
       devShells.${system}.default = pkgs.mkShell {
         packages = [
+          pkgs.opentofu
+          pkgs.incus
         ];
       };
 

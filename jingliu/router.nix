@@ -30,6 +30,12 @@
       { Address = "10.120.0.1/24"; }
       { Address = "fd8c:ac79:8818::/64"; }
     ];
+    routes = [
+      {
+        Gateway = "10.120.0.101";
+        Destination = "10.120.3.0/24";
+      }
+    ];
     networkConfig.DHCP = false;
     networkConfig.DHCPServer = true;
     networkConfig.IPv6AcceptRA = false;

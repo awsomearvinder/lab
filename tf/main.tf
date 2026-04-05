@@ -1,0 +1,3 @@
+module "herta" {
+  source = "./herta"
+}

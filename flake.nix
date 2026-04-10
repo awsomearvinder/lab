@@ -28,6 +28,7 @@
         packages = [
           pkgs.opentofu
           pkgs.incus
+          pkgs.just
         ];
       };
 

@@ -7,4 +7,13 @@ resource "incus_profile" "default" {
       network = "${incus_network.default.name}"
     }
   }
+  device {
+    name = "root"
+    type = "disk"
+    properties = {
+      pool = incus_storage_pool.default.name
+      path = "/"
+      size = "50GiB"
+    }
+  }
 }

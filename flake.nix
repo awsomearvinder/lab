@@ -62,5 +62,14 @@
           agenix.nixosModules.default
         ];
       };
+      nixosConfigurations.phainon = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          "${nixpkgs}/nixos/modules/virtualisation/lxc-container.nix"
+          ./lib/base.nix
+          ./phainon/configuration.nix
+          agenix.nixosModules.default
+        ];
+      };
     };
 }

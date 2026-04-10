@@ -3,17 +3,20 @@ let
 
   jingliu = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMPhNxZ3kPm1lIdfWv1ZNeiD3bbZ7O7EDCFP64HXKFvV";
   herta = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGVu0peUl8J72Wd+bDbEtnvrAin0byGxZnVItlooh9tw";
+  phainon = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN0X+WEnvBOnVEhi7CbyaQnuNDNYhzHk1rIF1JHCSWzE";
 in
 {
   "oinkKeyFile.age".publicKeys = [
     jingliu
     bender
     herta
+    phainon
   ];
   "oinkSecretKeyFile.age".publicKeys = [
     jingliu
     bender
     herta
+    phainon
   ];
   "technitium-admin-pass.age".publicKeys = [
     bender

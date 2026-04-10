@@ -29,6 +29,8 @@
           pkgs.opentofu
           pkgs.incus
           pkgs.just
+          pkgs.squashfsTools
+          pkgs.dotenvx
         ];
       };
 

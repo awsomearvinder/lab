@@ -23,4 +23,5 @@
       }
       header_up Host incus.herta.arvinderd.com
     }";
+  networking.firewall.trustedInterfaces = [ "default_network" ];
 }

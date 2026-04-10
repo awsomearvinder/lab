@@ -165,6 +165,7 @@
             iifname $INTERNAL oifname $WORLD counter accept
             iifname $INTERNAL oifname "podman0" counter accept
             ip daddr 10.120.0.101 accept
+            ip daddr 10.120.3.0/24 accept
             meta l4proto icmp accept
             counter
     	 }

@@ -34,4 +34,8 @@ in
     bender
     herta
   ];
+  "CF_API_KEY.age".publicKeys = [
+    bender
+    phainon
+  ];
 }

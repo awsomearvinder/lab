@@ -7,6 +7,7 @@
     agenix.url = "github:ryantm/agenix";
     proxmox-nixos.url = "github:SaumonNet/proxmox-nixos";
     vpn-confinement.url = "github:Maroka-chan/VPN-Confinement";
+    nix-minecraft.url = "github:Infinidoge/nix-minecraft";
   };
 
   outputs =
@@ -17,6 +18,7 @@
       agenix,
       proxmox-nixos,
       vpn-confinement,
+      nix-minecraft,
     }:
     let
       system = "x86_64-linux";
@@ -69,6 +71,8 @@
           ./lib/base.nix
           ./phainon/configuration.nix
           agenix.nixosModules.default
+          nix-minecraft.nixosModules.minecraft-servers
+          { nixpkgs.overlays = [ nix-minecraft.overlay ]; }
         ];
       };
     };

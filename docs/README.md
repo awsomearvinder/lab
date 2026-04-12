@@ -15,7 +15,16 @@ has a few key things it runs:
 - DHv6-PD, so it can get prefixes down for each of it's interfaces.
 
 Currently, it also routes back a static prefix on IPv4 land to herta, so we don't need
-to double NAT for herta's containers and VM's.
+to double NAT for herta's containers and VM's. Routing back IPv6 currently is
+an unsolved problem. I don't have a really great solution for it as we'd need to
+subdelegate an IPv6 prefix from DHCPv6-PD from systemd-networkd down to `herta`,
+but currently it seems like that's not a capability `systemd-networkd` supports.
+A jank work around in the future might be to give herta a second NIC, put that on
+a vlan, and let `systemd-networkd` manage that vlan with it's own `/64`. The containers
+could then grab an IPv6 address from `jingliu`'s RA. A bridge network on the herta side
+might work for this? But we might have to resort to a macvlan anyways, and it might
+make more sense as Incus doesn't really have control over the network in that case
+anyways.
 
 
 # Herta

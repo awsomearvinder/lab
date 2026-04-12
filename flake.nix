@@ -75,5 +75,13 @@
           { nixpkgs.overlays = [ nix-minecraft.overlay ]; }
         ];
       };
+      nixosConfigurations.bronya = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          "${nixpkgs}/nixos/modules/virtualisation/lxc-container.nix"
+          ./bronya/configuration.nix
+          agenix.nixosModules.default
+        ];
+      };
     };
 }

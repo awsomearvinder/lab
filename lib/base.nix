@@ -14,6 +14,10 @@
 
   networking.nftables.enable = true;
 
+  security.pki.certificateFiles = [
+    ./root_ca.crt
+  ];
+
   # Open ssh in the firewall.
   networking.firewall.allowedTCPPorts = [ 22 ];
 }

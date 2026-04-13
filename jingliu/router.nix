@@ -211,6 +211,11 @@
         sourcePort = 443;
       }
       {
+        destination = "10.120.0.101:25565";
+        proto = "tcp";
+        sourcePort = 25565;
+      }
+      {
         destination = "10.120.0.101:443";
         proto = "udp";
         sourcePort = 443;

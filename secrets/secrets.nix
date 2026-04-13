@@ -5,9 +5,11 @@ let
   herta = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGVu0peUl8J72Wd+bDbEtnvrAin0byGxZnVItlooh9tw";
   phainon = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN0X+WEnvBOnVEhi7CbyaQnuNDNYhzHk1rIF1JHCSWzE";
   bronya = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG87YNObxs/1xHyo0vLlJdlrUHfyOgJrgrJhyfefA7yX bender@desktop";
+  seele = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFTQTyPhHpa6vZmldpUFPyli1PUJ6CyFbWctViRpPxy8 bender@desktop";
 in
 {
   "oinkKeyFile.age".publicKeys = [
+    seele
     jingliu
     bender
     herta
@@ -15,6 +17,7 @@ in
     bronya
   ];
   "oinkSecretKeyFile.age".publicKeys = [
+    seele
     jingliu
     bender
     herta

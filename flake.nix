@@ -37,6 +37,15 @@
         ];
       };
 
+      nixosConfigurations.seele = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ./lib/base.nix
+          "${nixpkgs}/nixos/modules/virtualisation/lxc-container.nix"
+          ./seele/configuration.nix
+          agenix.nixosModules.default
+        ];
+      };
       nixosConfigurations.jingliu =
         let
           system = "x86_64-linux";

@@ -33,7 +33,7 @@
       DIFFICULTY = "normal";
       USE_SIMD_FLAGS = "TRUE";
       ENABLE_WHITELIST = "TRUE";
-      WHITELIST = "John_Benber";
+      WHITELIST = "John_Benber,xXScam42069Xx";
       CF_SLUG = "society-sunlit-valley";
       CF_FILE_ID = "7907890";
       CF_API_KEY_FILE = "/cf.key";

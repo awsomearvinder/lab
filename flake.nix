@@ -33,6 +33,7 @@
           pkgs.just
           pkgs.squashfsTools
           pkgs.dotenvx
+          agenix.outputs.packages.${system}.agenix
         ];
       };
 

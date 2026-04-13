@@ -40,7 +40,7 @@
       	"address": ":443",
       	"insecureAddress": "",
       	"dnsNames": [
-      		"arvinderd.com"
+      		"bronya.arvinderd.com"
       	],
       	"logger": {
       		"format": "text"
@@ -53,7 +53,7 @@
       		"provisioners": [
       			{
       				"type": "ACME",
-      				"name": "acme"
+      				"name": "ACME"
       			}
       		]
       	},

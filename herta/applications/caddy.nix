@@ -6,7 +6,7 @@
 }:
 let
   proxy_mapping = {
-    "test" = "test.seele";
+    "video" = "video.seele";
   };
 in
 {

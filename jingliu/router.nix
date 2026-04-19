@@ -210,8 +210,9 @@
         proto = "tcp";
         sourcePort = 443;
       }
+      # minecraft
       {
-        destination = "10.120.0.101:25565";
+        destination = "10.120.3.2:25565";
         proto = "tcp";
         sourcePort = 25565;
       }

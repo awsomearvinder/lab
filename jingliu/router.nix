@@ -54,7 +54,7 @@
     matchConfig.Name = "eno4";
     addresses = [
       { Address = "10.120.1.1/24"; }
-      { Address = "fd8c:ac79:8818:1:/64"; }
+      { Address = "fd8c:ac79:8818:1::/64"; }
     ];
     networkConfig.DHCP = false;
     networkConfig.DHCPServer = true;

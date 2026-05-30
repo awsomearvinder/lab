@@ -19,7 +19,6 @@
     networkConfig.DHCPServer = false;
     networkConfig.IPv6AcceptRA = true;
     networkConfig.IPv6SendRA = false;
-    networkConfig.IPMasquerade = true;
     dhcpV6Config = {
       PrefixDelegationHint = "::/60";
     };
@@ -46,6 +45,7 @@
     dhcpServerConfig.SendOption = "138:ipv4address:10.120.0.1";
     dhcpServerConfig.EmitDNS = "yes";
     dhcpServerConfig.DNS = "10.120.0.1";
+    networkConfig.IPMasquerade = "ipv4";
     # 1-100 is reserved.
     dhcpServerConfig.PoolSize = 99;
     dhcpPrefixDelegationConfig.SubnetId = 0;
@@ -63,6 +63,7 @@
     networkConfig.IPv6SendRA = true;
     networkConfig.DHCPPrefixDelegation = true;
     networkConfig.DNS = "10.120.0.1";
+    networkConfig.IPMasquerade = "ipv4";
     dhcpServerConfig.SendOption = "138:ipv4address:10.120.0.1";
     dhcpServerConfig.EmitDNS = "yes";
     dhcpServerConfig.DNS = "10.120.0.1";
@@ -123,6 +124,18 @@
     define INTERNAL = { "podman0", "eno3", "eno4" }
     define HERTA = "2601:447:ce80:4020:3256:fff:fe20:8f18"
     define WORLD = { "eno2" }
+
+    table ip portforwards {
+      chain PREROUTING {
+        type nat hook prerouting priority -100;
+
+        iifname $WORLD tcp dport 80 dnat 10.120.0.101:80
+        iifname $WORLD tcp dport 443 dnat 10.120.0.101:443
+        iifname $WORLD udp dport 443 dnat 10.120.0.101:443
+        iifname $WORLD tcp dport 25565 dnat 10.120.0.101:25565
+      }
+    }
+
     table ip6 FW {
         chain FORWARD {
             type filter hook forward priority filter; policy drop;
@@ -178,6 +191,10 @@
           # DNS
           iifname $INTERNAL tcp dport { 53 } accept
           iifname $INTERNAL udp dport { 53 } accept
+          iifname $INTERNAL tcp dport { 22 } accept
+          iifname $INTERNAL tcp dport { 443 } accept
+          iifname $INTERNAL udp dport { 443 } accept
+          iifname $INTERNAL tcp dport { 80 } accept
 
           tcp dport { 8088, 8043, 8843, 29810, 29811-29817 } accept
           udp dport { 19810, 27001, 29810, 29811-29817 } accept
@@ -196,39 +213,6 @@
   virtualisation.containers.containersConf.settings.network.firewall_driver =
     lib.mkDefault "nftables";
   virtualisation.podman.extraPackages = [ pkgs.nftables ];
-
-  networking.nat = {
-    enable = true;
-    forwardPorts = [
-      {
-        destination = "10.120.0.101:80";
-        proto = "tcp";
-        sourcePort = 80;
-      }
-      {
-        destination = "10.120.0.101:443";
-        proto = "tcp";
-        sourcePort = 443;
-      }
-      # minecraft
-      {
-        destination = "10.120.3.2:25565";
-        proto = "tcp";
-        sourcePort = 25565;
-      }
-      {
-        destination = "10.120.0.101:443";
-        proto = "udp";
-        sourcePort = 443;
-      }
-    ];
-    externalInterface = "eno2";
-    internalInterfaces = [
-      "eno1"
-      "eno3"
-      "eno4"
-    ];
-  };
 
   services.resolved.enable = true;
 

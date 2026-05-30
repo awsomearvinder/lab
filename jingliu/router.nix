@@ -99,6 +99,14 @@
       }
     ];
   };
+  virtualisation.containers.containersConf.settings = {
+    network = {
+      dns_bind_port = 5054;
+    };
+  };
+  virtualisation.podman.defaultNetwork.settings = {
+    dns_enabled = true;
+  };
   virtualisation.oci-containers.containers.omada-sdn = {
     image = "mbentley/omada-controller:6";
     extraOptions = [

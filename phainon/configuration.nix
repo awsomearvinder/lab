@@ -89,7 +89,7 @@
       DIFFICULTY = "normal";
       USE_SIMD_FLAGS = "TRUE";
       ENABLE_WHITELIST = "TRUE";
-      WHITELIST = "John_Benber,xXScam42069Xx,IMM3RSIVE,9rtyt,Geigus,ssommerai,sekahauwu";
+      WHITELIST = "John_Benber,xXScam42069Xx,IMM3RSIVE,9rtyt,Geigus,ssommerai,sekahauwu,KattmannPlayzz";
       CF_SLUG = "integrated-minecraft";
       CF_FILE_ID = "7926313";
       CF_API_KEY_FILE = "/cf.key";

@@ -19,9 +19,11 @@
     networkConfig.DHCPServer = false;
     networkConfig.IPv6AcceptRA = true;
     networkConfig.IPv6SendRA = false;
+    linkConfig.RequiredForOnline = true;
   };
   systemd.network.networks."10-lan" = {
     matchConfig.Name = "eno3";
+    linkConfig.RequiredForOnline = true;
     addresses = [
       { Address = "10.120.0.1/24"; }
       { Address = "fd8c:ac79:8818::/64"; }
@@ -48,24 +50,13 @@
     dhcpServerConfig.PoolSize = 99;
     dhcpPrefixDelegationConfig.SubnetId = 0;
   };
-  systemd.network.networks."20-omada" = {
+  systemd.network.networks."20-eno4" = {
     matchConfig.Name = "eno4";
-    addresses = [
-      { Address = "10.120.1.1/24"; }
-      { Address = "fd8c:ac79:8818:1::/64"; }
-    ];
-    networkConfig.DHCP = false;
-    networkConfig.DHCPServer = true;
-    networkConfig.IPv6AcceptRA = false;
-    networkConfig.ConfigureWithoutCarrier = true;
-    networkConfig.IPv6SendRA = true;
-    networkConfig.DHCPPrefixDelegation = true;
-    networkConfig.DNS = "10.120.0.1";
-    networkConfig.IPMasquerade = "ipv4";
-    dhcpServerConfig.SendOption = "138:ipv4address:10.120.0.1";
-    dhcpServerConfig.EmitDNS = "yes";
-    dhcpServerConfig.DNS = "10.120.0.1";
-    dhcpPrefixDelegationConfig.SubnetId = 1;
+    linkConfig.RequiredForOnline = false;
+  };
+  systemd.network.networks."25-eno1" = {
+    matchConfig.Name = "eno1";
+    linkConfig.RequiredForOnline = false;
   };
   systemd.network.netdevs."30-6in4" = {
     netdevConfig = {

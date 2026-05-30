@@ -26,8 +26,8 @@
     linkConfig.RequiredForOnline = true;
     addresses = [
       { Address = "10.120.0.1/24"; }
-      { Address = "fd8c:ac79:8818::/64"; }
-      { Address = "2a11:6c7:f35:b801::1/64"; }
+      { Address = "fd8c:ac79:8818::1/64"; }
+      { Address = "2a11:6c7:2600:b800::1/64"; }
     ];
     routes = [
       {
@@ -35,13 +35,28 @@
         Destination = "10.120.3.0/24";
       }
     ];
+    networkConfig.IPv6MTUBytes = 1480;
     networkConfig.DHCP = false;
     networkConfig.DHCPServer = true;
     networkConfig.IPv6AcceptRA = false;
     networkConfig.ConfigureWithoutCarrier = true;
     networkConfig.IPv6SendRA = true;
-    networkConfig.DHCPPrefixDelegation = true;
     networkConfig.DNS = "10.120.0.1";
+    ipv6SendRAConfig.Managed = false;
+    ipv6SendRAConfig.EmitDomains = true;
+    ipv6SendRAConfig.Domains = "arvinderd.com";
+    ipv6Prefixes = [
+      {
+        AddressAutoconfiguration = true;
+        OnLink = true;
+        Prefix = "2a11:6c7:2600:b800::1/64";
+      }
+      {
+        AddressAutoconfiguration = true;
+        OnLink = true;
+        Prefix = "fd8c:ac79:8818::1/64";
+      }
+    ];
     dhcpServerConfig.SendOption = "138:ipv4address:10.120.0.1";
     dhcpServerConfig.EmitDNS = "yes";
     dhcpServerConfig.DNS = "10.120.0.1";
@@ -140,7 +155,7 @@
   networking.nftables.ruleset = ''
     define INTERNAL = { "podman0", "eno3", "eno4" }
     define HERTA = "2601:447:ce80:4020:3256:fff:fe20:8f18"
-    define WORLD = { "eno2" }
+    define WORLD = { "eno2", "route64" }
 
     table ip portforwards {
       chain PREROUTING {
@@ -213,7 +228,7 @@
           iifname $INTERNAL udp dport { 443 } accept
           iifname $INTERNAL tcp dport { 80 } accept
 
-          ip protocol 41 ip saddr 23.154.9.27 accept
+          ip protocol 41 ip saddr 23.154.9.27 counter accept
 
           iifname $INTERNAL tcp dport { 29810, 29811-29817, 8043, 8843, 8088 } accept
           iifname $INTERNAL udp dport { 19810, 27001, 29810, 29811-29817 } accept

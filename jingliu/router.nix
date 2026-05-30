@@ -42,7 +42,7 @@
     networkConfig.ConfigureWithoutCarrier = true;
     networkConfig.IPv6SendRA = true;
     networkConfig.DHCPPrefixDelegation = true;
-    networkConfig.DNS = "1.1.1.1";
+    networkConfig.DNS = "10.120.0.1";
     dhcpServerConfig.SendOption = "138:ipv4address:10.120.0.1";
     dhcpServerConfig.EmitDNS = "yes";
     dhcpServerConfig.DNS = "10.120.0.1";
@@ -62,7 +62,7 @@
     networkConfig.ConfigureWithoutCarrier = true;
     networkConfig.IPv6SendRA = true;
     networkConfig.DHCPPrefixDelegation = true;
-    networkConfig.DNS = "1.1.1.1";
+    networkConfig.DNS = "10.120.0.1";
     dhcpServerConfig.SendOption = "138:ipv4address:10.120.0.1";
     dhcpServerConfig.EmitDNS = "yes";
     dhcpServerConfig.DNS = "10.120.0.1";

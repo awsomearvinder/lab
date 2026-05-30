@@ -25,6 +25,7 @@
       "/srv/minecraft/society-sunlit-valley:/data:rw"
       "${config.age.secrets.CF_API_KEY.path}:/cf.key:ro"
     ];
+    autoStart = false;
     ports = [
       "25566:25565"
     ];

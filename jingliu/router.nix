@@ -20,7 +20,7 @@
     networkConfig.IPv6AcceptRA = true;
     networkConfig.IPv6SendRA = false;
     dhcpV6Config = {
-      PrefixDelegationHint = "::/60";
+      PrefixDelegationHint = "::/60"; # We're now on QF. They don't do ipv6 :(.
     };
   };
   systemd.network.networks."10-lan" = {

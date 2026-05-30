@@ -19,15 +19,13 @@
     networkConfig.DHCPServer = false;
     networkConfig.IPv6AcceptRA = true;
     networkConfig.IPv6SendRA = false;
-    dhcpV6Config = {
-      PrefixDelegationHint = "::/60"; # We're now on QF. They don't do ipv6 :(.
-    };
   };
   systemd.network.networks."10-lan" = {
     matchConfig.Name = "eno3";
     addresses = [
       { Address = "10.120.0.1/24"; }
       { Address = "fd8c:ac79:8818::/64"; }
+      { Address = "2a11:6c7:f35:b801::1/64"; }
     ];
     routes = [
       {
@@ -68,6 +66,32 @@
     dhcpServerConfig.EmitDNS = "yes";
     dhcpServerConfig.DNS = "10.120.0.1";
     dhcpPrefixDelegationConfig.SubnetId = 1;
+  };
+  systemd.network.netdevs."30-6in4" = {
+    netdevConfig = {
+      Name = "route64";
+      Kind = "sit";
+      MTUBytes = 1480;
+    };
+    tunnelConfig = {
+      Remote = "23.154.9.27";
+      Local = "any";
+      TTL = 128;
+      Independent = true;
+    };
+  };
+  systemd.network.networks."40-route64" = {
+    matchConfig.Name = "route64";
+    linkConfig.RequiredForOnline = true;
+    addresses = [
+      { Address = "2a11:6c7:f35:b8::2/64"; }
+    ];
+    routes = [
+      {
+        Gateway = "2a11:6c7:f35:b8::1";
+        Destination = "::/0";
+      }
+    ];
   };
   virtualisation.oci-containers.containers.omada-sdn = {
     image = "mbentley/omada-controller:6";
@@ -197,6 +221,8 @@
           iifname $INTERNAL tcp dport { 443 } accept
           iifname $INTERNAL udp dport { 443 } accept
           iifname $INTERNAL tcp dport { 80 } accept
+
+          ip protocol 41 ip saddr 23.154.9.27 accept
 
           iifname $INTERNAL tcp dport { 29810, 29811-29817, 8043, 8843, 8088 } accept
           iifname $INTERNAL udp dport { 19810, 27001, 29810, 29811-29817 } accept

@@ -55,7 +55,7 @@
     ];
     environment = {
       EULA = "TRUE";
-      MAX_MEMORY = "16G";
+      MAX_MEMORY = "10G";
       TZ = "CST";
       TYPE = "GTNH";
       GTNH_PACK_VERSION = "2.8.4";
@@ -82,7 +82,7 @@
     ];
     environment = {
       EULA = "TRUE";
-      MAX_MEMORY = "16G";
+      MAX_MEMORY = "10G";
       TZ = "CST";
       TYPE = "AUTO_CURSEFORGE";
       DIFFICULTY = "normal";

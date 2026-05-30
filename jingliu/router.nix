@@ -70,10 +70,11 @@
     dhcpPrefixDelegationConfig.SubnetId = 1;
   };
   virtualisation.oci-containers.containers.omada-sdn = {
-    image = "mbentley/omada-controller:5.15";
+    image = "mbentley/omada-controller:6";
     extraOptions = [
       "--ulimit"
       "nofile=4096:8192"
+      "--network=host"
     ];
     environment = {
       TZ = "America/Chicago";
@@ -95,7 +96,7 @@
 
   services.caddy.acmeCA = "https://bronya.arvinderd.com/acme/ACME/directory";
   services.caddy.virtualHosts."omada.jingliu.arvinderd.com".extraConfig = ''
-    reverse_proxy https://10.120.0.1:8043 {
+    reverse_proxy https://127.0.0.1:8043 {
       transport http {
         tls
         tls_insecure_skip_verify
@@ -197,8 +198,8 @@
           iifname $INTERNAL udp dport { 443 } accept
           iifname $INTERNAL tcp dport { 80 } accept
 
-          tcp dport { 8088, 8043, 8843, 29810, 29811-29817 } accept
-          udp dport { 19810, 27001, 29810, 29811-29817 } accept
+          iifname $INTERNAL tcp dport { 29810, 29811-29817, 8043, 8843, 8088 } accept
+          iifname $INTERNAL udp dport { 19810, 27001, 29810, 29811-29817 } accept
           udp dport 67 accept
           meta l4proto icmp accept
           counter

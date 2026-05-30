@@ -16,6 +16,8 @@
   systemd.tmpfiles.rules = [
     "d /srv/minecraft/society-sunlit-valley 0755 root root -"
     "d /srv/minecraft/reclamation 0755 root root -"
+    "d /srv/minecraft/integrated_mc 0755 root root -"
+    "d /srv/minecraft/gtnh 0755 root root -"
   ];
   virtualisation.oci-containers.containers.society-sunlit-valley = {
     image = "itzg/minecraft-server:java17";
@@ -43,10 +45,36 @@
       VERSION = "1.20.1";
     };
   };
-  virtualisation.oci-containers.containers.reclamation = {
+  virtualisation.oci-containers.containers.gtnh = {
+    image = "itzg/minecraft-server:java25";
+    volumes = [
+      "/srv/minecraft/gtnh:/data:rw"
+    ];
+    ports = [
+      "25567:25565"
+    ];
+    environment = {
+      EULA = "TRUE";
+      MAX_MEMORY = "16G";
+      TZ = "CST";
+      TYPE = "GTNH";
+      GTNH_PACK_VERSION = "2.8.4";
+      USE_SIMD_FLAGS = "TRUE";
+      ENABLE_WHITELIST = "TRUE";
+      WHITELIST = "John_Benber,xXScam42069Xx,javierhernan,ExtremeDoom";
+      OPS = "javierhernan,John_Benber,ExtremeDoom";
+      JVM_DD_OPTS = "fml.queryResult:confirm";
+    };
+  };
+  networking.firewall.allowedTCPPorts = [
+    25565
+    25566
+    25567
+  ];
+  virtualisation.oci-containers.containers.integrated_mc = {
     image = "itzg/minecraft-server:java17";
     volumes = [
-      "/srv/minecraft/reclamation:/data:rw"
+      "/srv/minecraft/integrated_mc:/data:rw"
       "${config.age.secrets.CF_API_KEY.path}:/cf.key:ro"
     ];
     ports = [
@@ -61,9 +89,11 @@
       USE_SIMD_FLAGS = "TRUE";
       ENABLE_WHITELIST = "TRUE";
       WHITELIST = "John_Benber,xXScam42069Xx,IMM3RSIVE,9rtyt,Geigus,ssommerai,sekahauwu";
-      CF_SLUG = "reclamation-reclaim-the-world";
-      CF_FILE_ID = "7294476";
+      CF_SLUG = "integrated-minecraft";
+      CF_FILE_ID = "7926313";
       CF_API_KEY_FILE = "/cf.key";
+      CF_FORCE_INCLUDE_MODS = "particular-reforged,status-effect-bars-reforged";
+      CF_FORCE_SYNCHRONIZE = "TRUE";
       VERSION = "1.20.1";
     };
   };

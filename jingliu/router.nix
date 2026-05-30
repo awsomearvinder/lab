@@ -241,6 +241,14 @@
       }
     }
 
+    table ip HERTA_NAT {
+      chain NAT {
+        type nat hook postrouting priority srcnat; policy accept;
+
+        ip saddr 10.120.3.0/24 oifname $WORLD masquerade
+      }
+    }
+
   '';
   virtualisation.containers.containersConf.settings.network.network_backend =
     lib.mkDefault "netavark";

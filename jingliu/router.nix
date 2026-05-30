@@ -40,23 +40,23 @@
     networkConfig.DHCPServer = true;
     networkConfig.IPv6AcceptRA = false;
     networkConfig.ConfigureWithoutCarrier = true;
-    networkConfig.IPv6SendRA = true;
+    # networkConfig.IPv6SendRA = true;
     networkConfig.DNS = "10.120.0.1";
-    ipv6SendRAConfig.Managed = false;
-    ipv6SendRAConfig.EmitDomains = true;
-    ipv6SendRAConfig.Domains = "arvinderd.com";
-    ipv6Prefixes = [
-      {
-        AddressAutoconfiguration = true;
-        OnLink = true;
-        Prefix = "2a11:6c7:2600:b800::1/64";
-      }
-      {
-        AddressAutoconfiguration = true;
-        OnLink = true;
-        Prefix = "fd8c:ac79:8818::1/64";
-      }
-    ];
+    # ipv6SendRAConfig.Managed = false;
+    # ipv6SendRAConfig.EmitDomains = true;
+    # ipv6SendRAConfig.Domains = "arvinderd.com";
+    # ipv6Prefixes = [
+    #   {
+    #     AddressAutoconfiguration = true;
+    #     OnLink = true;
+    #     Prefix = "2a11:6c7:2600:b800::1/64";
+    #   }
+    #   {
+    #     AddressAutoconfiguration = true;
+    #     OnLink = true;
+    #     Prefix = "fd8c:ac79:8818::1/64";
+    #   }
+    # ];
     dhcpServerConfig.SendOption = "138:ipv4address:10.120.0.1";
     dhcpServerConfig.EmitDNS = "yes";
     dhcpServerConfig.DNS = "10.120.0.1";

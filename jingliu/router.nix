@@ -93,6 +93,7 @@
     ];
   };
 
+  services.caddy.acmeCA = "https://bronya.arvinderd.com/acme/ACME/directory";
   services.caddy.virtualHosts."omada.jingliu.arvinderd.com".extraConfig = ''
     reverse_proxy https://10.120.0.1:8043 {
       transport http {

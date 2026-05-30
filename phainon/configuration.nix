@@ -31,7 +31,7 @@
     environment = {
       EULA = "TRUE";
       MAX_MEMORY = "16G";
-      TZ = "CST";
+      TZ = "America/Chicago";
       TYPE = "AUTO_CURSEFORGE";
       DIFFICULTY = "normal";
       USE_SIMD_FLAGS = "TRUE";
@@ -56,7 +56,7 @@
     environment = {
       EULA = "TRUE";
       MAX_MEMORY = "10G";
-      TZ = "CST";
+      TZ = "America/Chicago";
       TYPE = "GTNH";
       GTNH_PACK_VERSION = "2.8.4";
       USE_SIMD_FLAGS = "TRUE";
@@ -83,7 +83,7 @@
     environment = {
       EULA = "TRUE";
       MAX_MEMORY = "10G";
-      TZ = "CST";
+      TZ = "America/Chicago";
       TYPE = "AUTO_CURSEFORGE";
       DIFFICULTY = "normal";
       USE_SIMD_FLAGS = "TRUE";

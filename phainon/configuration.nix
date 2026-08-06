@@ -20,7 +20,7 @@
     "d /srv/minecraft/gtnh 0755 root root -"
   ];
   virtualisation.oci-containers.containers.society-sunlit-valley = {
-    image = "itzg/minecraft-server:java17";
+    image = "docker.io/itzg/minecraft-server:java17";
     volumes = [
       "/srv/minecraft/society-sunlit-valley:/data:rw"
       "${config.age.secrets.CF_API_KEY.path}:/cf.key:ro"
@@ -47,7 +47,7 @@
     };
   };
   virtualisation.oci-containers.containers.gtnh = {
-    image = "itzg/minecraft-server:java25";
+    image = "docker.io/itzg/minecraft-server:java25";
     volumes = [
       "/srv/minecraft/gtnh:/data:rw"
     ];
@@ -73,7 +73,7 @@
     25567
   ];
   virtualisation.oci-containers.containers.integrated_mc = {
-    image = "itzg/minecraft-server:java17";
+    image = "docker.io/itzg/minecraft-server:java17";
     volumes = [
       "/srv/minecraft/integrated_mc:/data:rw"
       "${config.age.secrets.CF_API_KEY.path}:/cf.key:ro"

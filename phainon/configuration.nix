@@ -89,7 +89,7 @@
       DIFFICULTY = "normal";
       USE_SIMD_FLAGS = "TRUE";
       ENABLE_WHITELIST = "TRUE";
-      WHITELIST = "John_Benber,xXScam42069Xx,IMM3RSIVE,9rtyt,Geigus,ssommerai,sekahauwu,KattmannPlayzz,Oohaha1";
+      WHITELIST = "John_Benber,xXScam42069Xx,IMM3RSIVE,9rtyt,Geigus,ssommerai,sekahauwu,KattmannPlayzz,Oohaha1,WalkEmDownBilly";
       OPS = "John_Benber";
       CF_SLUG = "integrated-minecraft";
       CF_FILE_ID = "7926313";

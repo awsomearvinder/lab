@@ -60,4 +60,8 @@ in
     bender
     bronya
   ];
+  "jingliu_wireguard.age".publicKeys = [
+    bender
+    jingliu
+  ];
 }

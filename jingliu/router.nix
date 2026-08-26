@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   lib,
   ...
@@ -17,7 +18,7 @@
     matchConfig.Name = "eno2";
     networkConfig.DHCP = "ipv4";
     networkConfig.DHCPServer = false;
-    networkConfig.IPv6AcceptRA = true;
+    networkConfig.IPv6AcceptRA = false;
     networkConfig.IPv6SendRA = false;
     linkConfig.RequiredForOnline = true;
   };
@@ -34,29 +35,33 @@
         Gateway = "10.120.0.101";
         Destination = "10.120.3.0/24";
       }
+      {
+        Gateway = "2a11:6c7:f35:b8::1";
+        Destination = "::/0";
+      }
     ];
     networkConfig.IPv6MTUBytes = 1480;
     networkConfig.DHCP = false;
     networkConfig.DHCPServer = true;
     networkConfig.IPv6AcceptRA = false;
     networkConfig.ConfigureWithoutCarrier = true;
-    # networkConfig.IPv6SendRA = true;
+    networkConfig.IPv6SendRA = true;
     networkConfig.DNS = "10.120.0.1";
-    # ipv6SendRAConfig.Managed = false;
-    # ipv6SendRAConfig.EmitDomains = true;
-    # ipv6SendRAConfig.Domains = "arvinderd.com";
-    # ipv6Prefixes = [
-    #   {
-    #     AddressAutoconfiguration = true;
-    #     OnLink = true;
-    #     Prefix = "2a11:6c7:2600:b800::1/64";
-    #   }
-    #   {
-    #     AddressAutoconfiguration = true;
-    #     OnLink = true;
-    #     Prefix = "fd8c:ac79:8818::1/64";
-    #   }
-    # ];
+    ipv6SendRAConfig.Managed = false;
+    ipv6SendRAConfig.EmitDomains = true;
+    ipv6SendRAConfig.Domains = "arvinderd.com";
+    ipv6Prefixes = [
+      {
+        AddressAutoconfiguration = true;
+        OnLink = true;
+        Prefix = "2a11:6c7:2600:b800::1/64";
+      }
+      {
+        AddressAutoconfiguration = true;
+        OnLink = true;
+        Prefix = "fd8c:ac79:8818::1/64";
+      }
+    ];
     dhcpServerConfig.SendOption = "138:ipv4address:10.120.0.1";
     dhcpServerConfig.EmitDNS = "yes";
     dhcpServerConfig.DNS = "10.120.0.1";
@@ -73,19 +78,26 @@
     matchConfig.Name = "eno1";
     linkConfig.RequiredForOnline = false;
   };
-  systemd.network.netdevs."30-6in4" = {
+  systemd.network.netdevs."30-wireguard-route64" = {
     netdevConfig = {
       Name = "route64";
-      Kind = "sit";
-      MTUBytes = 1480;
+      Kind = "wireguard";
+      MTUBytes = 1420;
     };
-    tunnelConfig = {
-      Remote = "23.154.9.27";
-      Local = "any";
-      TTL = 128;
-      Independent = true;
+    wireguardConfig = {
+      PrivateKeyFile = "${config.age.secrets.wireguardKey.path}";
     };
+    wireguardPeers = [
+      {
+        PublicKey = "vWnj0B/k9ldx0p3EXLZ8FiL7hO0z2RSnQqIgSY4W1A4=";
+        AllowedIPs = "::/0";
+        Endpoint = "23.154.9.27:20106";
+        PersistentKeepalive = 15;
+      }
+    ];
   };
+  age.secrets.wireguardKey.file = ../secrets/jingliu_wireguard.age;
+  age.secrets.wireguardKey.owner = config.users.users.systemd-network.name;
   systemd.network.networks."40-route64" = {
     matchConfig.Name = "route64";
     linkConfig.RequiredForOnline = true;
@@ -162,7 +174,7 @@
   networking.nftables.checkRuleset = true;
   networking.nftables.ruleset = ''
     define INTERNAL = { "podman0", "eno3", "eno4" }
-    define HERTA = "2601:447:ce80:4020:3256:fff:fe20:8f18"
+    define HERTA = "2a11:6c7:2600:b800:3256:fff:fe20:8f18"
     define WORLD = { "eno2", "route64" }
 
     table ip portforwards {
@@ -236,8 +248,6 @@
           iifname $INTERNAL tcp dport { 443 } accept
           iifname $INTERNAL udp dport { 443 } accept
           iifname $INTERNAL tcp dport { 80 } accept
-
-          ip protocol 41 ip saddr 23.154.9.27 counter accept
 
           iifname $INTERNAL tcp dport { 29810, 29811-29817, 8043, 8843, 8088 } accept
           iifname $INTERNAL udp dport { 19810, 27001, 29810, 29811-29817 } accept

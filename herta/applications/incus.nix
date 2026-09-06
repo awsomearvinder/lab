@@ -7,7 +7,7 @@
     preseed = {
       config = {
         "core.https_address" = "localhost:1320";
-        "core.https_trusted_proxy" = "127.0.0.1";
+        "core.https_trusted_proxy" = "127.0.0.1,::1";
         "oidc.client.id" = "2ebb0267-64ea-4b4d-8512-b71faf7fb771";
         "oidc.issuer" = "https://oidc.herta.arvinderd.com";
         "oidc.scopes" = "openid, email, profile";

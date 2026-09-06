@@ -28,7 +28,7 @@
     addresses = [
       { Address = "10.120.0.1/24"; }
       { Address = "fd8c:ac79:8818::1/64"; }
-      { Address = "2a11:6c7:2600:b800::1/64"; }
+      { Address = "2a11:6c7:2001:cc00::1/64"; }
     ];
     routes = [
       {
@@ -36,7 +36,7 @@
         Destination = "10.120.3.0/24";
       }
       {
-        Gateway = "2a11:6c7:f35:b8::1";
+        Gateway = "2a11:6c7:f03:163::1";
         Destination = "::/0";
       }
     ];
@@ -54,7 +54,7 @@
       {
         AddressAutoconfiguration = true;
         OnLink = true;
-        Prefix = "2a11:6c7:2600:b800::1/64";
+        Prefix = "2a11:6c7:2001:cc00::1/64";
       }
       {
         AddressAutoconfiguration = true;
@@ -89,9 +89,9 @@
     };
     wireguardPeers = [
       {
-        PublicKey = "vWnj0B/k9ldx0p3EXLZ8FiL7hO0z2RSnQqIgSY4W1A4=";
+        PublicKey = "j6+IH1aFUqgjQn+pE+3v7WzJSpcqA5KTk3JRcea1TiM=";
         AllowedIPs = "::/0";
-        Endpoint = "23.154.9.27:20106";
+        Endpoint = "23.150.41.118:20060";
         PersistentKeepalive = 15;
       }
     ];
@@ -102,11 +102,11 @@
     matchConfig.Name = "route64";
     linkConfig.RequiredForOnline = true;
     addresses = [
-      { Address = "2a11:6c7:f35:b8::2/64"; }
+      { Address = "2a11:6c7:f03:163::2/64"; }
     ];
     routes = [
       {
-        Gateway = "2a11:6c7:f35:b8::1";
+        Gateway = "2a11:6c7:f03:163::1";
         Destination = "::/0";
       }
     ];
@@ -174,7 +174,7 @@
   networking.nftables.checkRuleset = true;
   networking.nftables.ruleset = ''
     define INTERNAL = { "podman0", "eno3", "eno4" }
-    define HERTA = "2a11:6c7:2600:b800:3256:fff:fe20:8f18"
+    define HERTA = "2a11:6c7:2001:cc00:3256:fff:fe20:8f18"
     define WORLD = { "eno2", "route64" }
 
     table ip portforwards {

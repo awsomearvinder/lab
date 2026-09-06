@@ -20,6 +20,7 @@
       transport http {
         tls
         tls_insecure_skip_verify
+        proxy_protocol v2
       }
       header_up Host incus.herta.arvinderd.com
     }";

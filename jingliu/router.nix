@@ -1,7 +1,5 @@
 {
   config,
-  pkgs,
-  lib,
   ...
 }:
 {
@@ -185,7 +183,7 @@
     }
 
     table ip FW {
-    	 chain FORWARD {
+       chain FORWARD {
             type filter hook forward priority filter; policy drop;
             ct state established,related accept
             ct state invalid counter drop
@@ -195,7 +193,7 @@
             ip daddr 10.120.3.0/24 accept
             meta l4proto icmp accept
             counter
-    	 }
+       }
       chain INCOMING {
           type filter hook input priority filter; policy drop;
           ct state established,related accept

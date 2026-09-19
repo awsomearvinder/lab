@@ -44,12 +44,6 @@ in
     matchConfig.Name = "eno3";
     linkConfig.RequiredForOnline = true;
     addresses = [
-    ];
-    routes = [
-      {
-        Gateway = "2a11:6c7:f03:163::1";
-        Destination = "::/0";
-      }
       { Address = "${lanGatewayIpv4}/${lanCIDR}"; }
       { Address = "${lanUlaGateway}/64"; }
       { Address = "${lanGuaGateway}/64"; }
@@ -59,9 +53,6 @@ in
     networkConfig.IPv6AcceptRA = false;
     networkConfig.ConfigureWithoutCarrier = true;
     networkConfig.IPv6SendRA = false;
-    ipv6SendRAConfig.Managed = false;
-    ipv6SendRAConfig.EmitDomains = true;
-    ipv6SendRAConfig.Domains = "arvinderd.com";
     networkConfig.DNS = "${jingliuIp}";
     ipv6Prefixes = [
       {

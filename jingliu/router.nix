@@ -36,12 +36,11 @@
         Destination = "::/0";
       }
     ];
-    networkConfig.IPv6MTUBytes = 1480;
     networkConfig.DHCP = false;
     networkConfig.DHCPServer = true;
     networkConfig.IPv6AcceptRA = false;
     networkConfig.ConfigureWithoutCarrier = true;
-    networkConfig.IPv6SendRA = true;
+    networkConfig.IPv6SendRA = false;
     networkConfig.DNS = "10.120.0.1";
     ipv6SendRAConfig.Managed = false;
     ipv6SendRAConfig.EmitDomains = true;
@@ -285,6 +284,10 @@
   };
   services.frr = {
     config = ''
+      interface eno3
+        no ipv6 nd suppress-ra
+        ipv6 nd prefix 2a11:6c7:2001:cc00::1/64
+        ipv6 nd mtu 1420
       router bgp 4261420343
         no bgp default ipv4-unicast
         bgp router-id 10.120.0.1

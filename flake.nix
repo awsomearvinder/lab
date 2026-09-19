@@ -37,6 +37,15 @@
         ];
       };
 
+      nixosConfigurations.akivili = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ./lib/base.nix
+          "${nixpkgs}/nixos/modules/virtualisation/lxc-container.nix"
+          ./akivili/configuration.nix
+          agenix.nixosModules.default
+        ];
+      };
       nixosConfigurations.seele = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [

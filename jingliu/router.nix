@@ -57,7 +57,7 @@
         Prefix = "fd8c:ac79:8818::1/64";
       }
     ];
-    dhcpServerConfig.SendOption = "138:ipv4address:10.120.0.1";
+    dhcpServerConfig.SendOption = "138:ipv4address:10.120.3.5";
     dhcpServerConfig.EmitDNS = "yes";
     dhcpServerConfig.DNS = "10.120.0.1";
     networkConfig.IPMasquerade = "ipv4";
@@ -106,48 +106,8 @@
       }
     ];
   };
-  virtualisation.containers.containersConf.settings = {
-    network = {
-      dns_bind_port = 5054;
-    };
-  };
-  virtualisation.podman.defaultNetwork.settings = {
-    dns_enabled = true;
-  };
-  virtualisation.oci-containers.containers.omada-sdn = {
-    image = "mbentley/omada-controller:6";
-    extraOptions = [
-      "--ulimit"
-      "nofile=4096:8192"
-      "--network=host"
-    ];
-    environment = {
-      TZ = "America/Chicago";
-    };
-    ports = [
-      "10.120.0.1:8088:8088"
-      "10.120.0.1:8043:8043"
-      "10.120.0.1:8843:8843"
-      "10.120.0.1:19810:19810/udp"
-      "10.120.0.1:27001:27001/udp"
-      "10.120.0.1:29810:29810/udp"
-      "10.120.0.1:29811-29816:29811-29816"
-    ];
-    volumes = [
-      "/persist/omada-controller/data:/opt/tplink/EAPController/data"
-      "/persist/omada-controller/logs:/opt/tplink/EAPController/logs"
-    ];
-  };
 
   services.caddy.acmeCA = "https://bronya.arvinderd.com/acme/ACME/directory";
-  services.caddy.virtualHosts."omada.jingliu.arvinderd.com".extraConfig = ''
-    reverse_proxy https://127.0.0.1:8043 {
-      transport http {
-        tls
-        tls_insecure_skip_verify
-      }
-    }
-  '';
 
   environment.persistence."/persist".directories = [
     {
@@ -270,11 +230,6 @@
     }
 
   '';
-  virtualisation.containers.containersConf.settings.network.network_backend =
-    lib.mkDefault "netavark";
-  virtualisation.containers.containersConf.settings.network.firewall_driver =
-    lib.mkDefault "nftables";
-  virtualisation.podman.extraPackages = [ pkgs.nftables ];
 
   services.resolved.enable = true;
 

@@ -32,10 +32,6 @@
     ];
     routes = [
       {
-        Gateway = "10.120.0.101";
-        Destination = "10.120.3.0/24";
-      }
-      {
         Gateway = "2a11:6c7:f03:163::1";
         Destination = "::/0";
       }
@@ -204,6 +200,9 @@
             tcp dport 22 accept
             tcp dport { 80, 443 } accept
 
+            # BGP
+            iifname $INTERNAL tcp dport 179 counter accept
+
             # LDAP
             iifname $INTERNAL tcp dport { 6360, 3890 } accept
             tcp dport { 80, 443 } accept
@@ -277,6 +276,27 @@
 
   services.resolved.enable = true;
 
+  services.frr.bgpd = {
+    enable = true;
+    options = [
+      "--listenon fd8c:ac79:8818::1" # Only listen on ULA.
+    ];
+  };
+  services.frr = {
+    config = ''
+      router bgp 4261420343
+        no bgp default ipv4-unicast
+        bgp router-id 10.120.0.1
+
+        neighbor fd8c:ac79:8818:0:3256:fff:fe20:8f18 remote-as 4261420343
+        address-family ipv6 unicast
+          neighbor fd8c:ac79:8818:0:3256:fff:fe20:8f18 activate
+        exit-address-family
+        address-family ipv4 unicast
+          neighbor fd8c:ac79:8818:0:3256:fff:fe20:8f18 activate
+        exit-address-family
+    '';
+  };
   services.adguardhome = {
     enable = true;
     host = "127.0.0.1";

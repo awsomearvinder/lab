@@ -7,5 +7,10 @@ resource "incus_network" "default" {
     "ipv4.nat" = "false"
     "ipv4.dhcp" = "true"
     "ipv4.dhcp.gateway" = "10.120.3.1"
+    "ipv6.address" = "fd8c:ac79:8818:0001::1/64"
+    "ipv6.nat" = "false"
+    "ipv6.dhcp" = "false"
+    "bgp.peers.jingliu.address" = "fd8c:ac79:8818::1"
+    "bgp.peers.jingliu.asn" = "4261420343"
   }
 }

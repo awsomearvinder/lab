@@ -2,6 +2,26 @@
   config,
   ...
 }:
+let
+  lanGatewayIpv4 = "10.120.0.1";
+  lanCIDR = "24";
+  lanUlaGateway = "fd8c:ac79:8818::1";
+  lanGuaGateway = "2a11:6c7:2001:cc00::1";
+
+  route64Gateway = "2a11:6c7:f03:163::1";
+  route64Address = "2a11:6c7:f03:163::2";
+
+  jingliuIp = "10.120.0.1";
+  hertaIp = "10.120.0.101";
+  hertaIpv6 = "2a11:6c7:2001:cc00:3256:fff:fe20:8f18";
+
+  # We provbably want to be able to name these addresses somewhere.
+  # Since these are actually stored in NixOS confs, we could probably import
+  # them dynamically from somewhere based off of hostname in the host confs,
+  # and query them via something like ${config.hosts.akivili.address} or something.
+  # Ditto for the above dnsServer.
+  omadaController = "10.120.3.5";
+in
 {
   boot.kernel.sysctl = {
     "net.ipv4.conf.all.forwarding" = 1;
@@ -24,40 +44,40 @@
     matchConfig.Name = "eno3";
     linkConfig.RequiredForOnline = true;
     addresses = [
-      { Address = "10.120.0.1/24"; }
-      { Address = "fd8c:ac79:8818::1/64"; }
-      { Address = "2a11:6c7:2001:cc00::1/64"; }
     ];
     routes = [
       {
         Gateway = "2a11:6c7:f03:163::1";
         Destination = "::/0";
       }
+      { Address = "${lanGatewayIpv4}/${lanCIDR}"; }
+      { Address = "${lanUlaGateway}/64"; }
+      { Address = "${lanGuaGateway}/64"; }
     ];
     networkConfig.DHCP = false;
     networkConfig.DHCPServer = true;
     networkConfig.IPv6AcceptRA = false;
     networkConfig.ConfigureWithoutCarrier = true;
     networkConfig.IPv6SendRA = false;
-    networkConfig.DNS = "10.120.0.1";
     ipv6SendRAConfig.Managed = false;
     ipv6SendRAConfig.EmitDomains = true;
     ipv6SendRAConfig.Domains = "arvinderd.com";
+    networkConfig.DNS = "${jingliuIp}";
     ipv6Prefixes = [
       {
         AddressAutoconfiguration = true;
         OnLink = true;
-        Prefix = "2a11:6c7:2001:cc00::1/64";
+        Prefix = "${lanGuaGateway}/64";
       }
       {
         AddressAutoconfiguration = true;
         OnLink = true;
-        Prefix = "fd8c:ac79:8818::1/64";
+        Prefix = "${lanUlaGateway}/64";
       }
     ];
-    dhcpServerConfig.SendOption = "138:ipv4address:10.120.3.5";
+    dhcpServerConfig.SendOption = "138:ipv4address:${omadaController}";
     dhcpServerConfig.EmitDNS = "yes";
-    dhcpServerConfig.DNS = "10.120.0.1";
+    dhcpServerConfig.DNS = "${jingliuIp}";
     networkConfig.IPMasquerade = "ipv4";
     # 1-100 is reserved.
     dhcpServerConfig.PoolSize = 99;
@@ -95,11 +115,11 @@
     matchConfig.Name = "route64";
     linkConfig.RequiredForOnline = true;
     addresses = [
-      { Address = "2a11:6c7:f03:163::2/64"; }
+      { Address = "${route64Address}/64"; }
     ];
     routes = [
       {
-        Gateway = "2a11:6c7:f03:163::1";
+        Gateway = "${route64Gateway}";
         Destination = "::/0";
       }
     ];
@@ -127,7 +147,7 @@
   networking.nftables.checkRuleset = true;
   networking.nftables.ruleset = ''
     define INTERNAL = { "podman0", "eno3", "eno4" }
-    define HERTA = "2a11:6c7:2001:cc00:3256:fff:fe20:8f18"
+    define HERTA = "${hertaIpv6}"
     define HERTA_VMS = { 2a11:6c7:2001:cc01::/64 }
     define WORLD = { "eno2", "route64" }
 
@@ -135,9 +155,9 @@
       chain PREROUTING {
         type nat hook prerouting priority -100;
 
-        iifname $WORLD tcp dport 80 dnat 10.120.0.101:80
-        iifname $WORLD tcp dport 443 dnat 10.120.0.101:443
-        iifname $WORLD udp dport 443 dnat 10.120.0.101:443
+        iifname $WORLD tcp dport 80 dnat ${hertaIp}:80
+        iifname $WORLD tcp dport 443 dnat ${hertaIp}:443
+        iifname $WORLD udp dport 443 dnat ${hertaIp}:443
         iifname $WORLD tcp dport 25565 dnat 10.120.3.2:25565
         iifname $WORLD tcp dport 25567 dnat 10.120.3.2:25567
       }
@@ -189,7 +209,7 @@
             ct state invalid counter drop
             iifname $INTERNAL oifname $WORLD counter accept
             iifname $INTERNAL oifname "podman0" counter accept
-            ip daddr 10.120.0.101 accept
+            ip daddr ${hertaIp} accept
             ip daddr 10.120.3.0/24 accept
             meta l4proto icmp accept
             counter
@@ -234,22 +254,22 @@
   services.frr.bgpd = {
     enable = true;
     options = [
-      "--listenon 2a11:6c7:2001:cc00::1" # Only listen on ULA.
+      "--listenon ${lanGuaGateway}" # Only listen on ULA.
     ];
   };
   services.frr = {
     config = ''
       interface eno3
         no ipv6 nd suppress-ra
-        ipv6 nd prefix 2a11:6c7:2001:cc00::1/64
+        ipv6 nd prefix ${lanGuaGateway}/64
         ipv6 nd mtu 1420
       router bgp 4261420343
         no bgp default ipv4-unicast
-        bgp router-id 10.120.0.1
+        bgp router-id ${jingliuIp}
 
-        neighbor 2a11:6c7:2001:cc00:3256:fff:fe20:8f18 remote-as 4261420343
+        neighbor ${hertaIpv6} remote-as 4261420343
         address-family ipv6 unicast
-          neighbor 2a11:6c7:2001:cc00:3256:fff:fe20:8f18 activate
+          neighbor ${hertaIpv6} activate
         exit-address-family
         address-family ipv4 unicast
           neighbor 2a11:6c7:2001:cc00:3256:fff:fe20:8f18 activate
@@ -271,7 +291,7 @@
       dns = {
         bind_hosts = [
           # we block this using the fw, so we all good.
-          "10.120.0.1"
+          "${jingliuIp}"
         ];
         port = 53;
       };

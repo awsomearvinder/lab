@@ -189,8 +189,9 @@
         chain FORWARD {
             type filter hook forward priority filter; policy drop;
             ct state established,related accept
-            ct state invalid counter drop
-            iifname $INTERNAL oifname $WORLD  counter accept
+            iifname $INTERNAL oifname $INTERNAL counter accept
+            ct state invalid counter log prefix "INVALID: " level warn drop
+            iifname $INTERNAL oifname $WORLD counter accept
             ip6 daddr $HERTA counter accept
             meta l4proto ipv6-icmp counter accept
         }

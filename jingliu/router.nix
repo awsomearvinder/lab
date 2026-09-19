@@ -280,7 +280,7 @@
   services.frr.bgpd = {
     enable = true;
     options = [
-      "--listenon fd8c:ac79:8818::1" # Only listen on ULA.
+      "--listenon 2a11:6c7:2001:cc00::1" # Only listen on ULA.
     ];
   };
   services.frr = {
@@ -289,12 +289,12 @@
         no bgp default ipv4-unicast
         bgp router-id 10.120.0.1
 
-        neighbor fd8c:ac79:8818:0:3256:fff:fe20:8f18 remote-as 4261420343
+        neighbor 2a11:6c7:2001:cc00:3256:fff:fe20:8f18 remote-as 4261420343
         address-family ipv6 unicast
-          neighbor fd8c:ac79:8818:0:3256:fff:fe20:8f18 activate
+          neighbor 2a11:6c7:2001:cc00:3256:fff:fe20:8f18 activate
         exit-address-family
         address-family ipv4 unicast
-          neighbor fd8c:ac79:8818:0:3256:fff:fe20:8f18 activate
+          neighbor 2a11:6c7:2001:cc00:3256:fff:fe20:8f18 activate
         exit-address-family
     '';
   };

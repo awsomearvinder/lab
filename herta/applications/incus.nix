@@ -8,7 +8,7 @@
       config = {
         "core.https_address" = "localhost:1320";
         "core.https_trusted_proxy" = "127.0.0.1,::1";
-        "core.bgp_address" = "fd8c:ac79:8818:0:3256:fff:fe20:8f18";
+        "core.bgp_address" = "2a11:6c7:2001:cc00:3256:fff:fe20:8f18";
         "core.bgp_asn" = "4261420343";
         "core.bgp_routerid" = "10.120.3.1";
         "oidc.client.id" = "2ebb0267-64ea-4b4d-8512-b71faf7fb771";

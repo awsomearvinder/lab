@@ -170,6 +170,7 @@
   networking.nftables.ruleset = ''
     define INTERNAL = { "podman0", "eno3", "eno4" }
     define HERTA = "2a11:6c7:2001:cc00:3256:fff:fe20:8f18"
+    define HERTA_VMS = { 2a11:6c7:2001:cc01::/64 }
     define WORLD = { "eno2", "route64" }
 
     table ip portforwards {
@@ -191,6 +192,7 @@
             iifname $INTERNAL oifname $INTERNAL counter accept
             ct state invalid counter log prefix "INVALID: " level warn drop
             iifname $INTERNAL oifname $WORLD counter accept
+            iifname $INTERNAL ip6 daddr $HERTA_VMS counter accept
             ip6 daddr $HERTA counter accept
             meta l4proto ipv6-icmp counter accept
         }

@@ -1,9 +1,24 @@
 {
   config,
-  pkgs,
-  lib,
   ...
 }:
+let
+  lanAddress = "10.120.0.1/24";
+  lanIp = "10.120.0.1";
+  webForwardTarget = "10.120.0.101";
+  vmSubnet = "10.120.3.0/24";
+  vmForwardTarget = "10.120.3.2";
+  dhcpOption138Target = "10.120.3.5";
+  ulaAddress = "fd8c:ac79:8818::1/64";
+  publicIpv6Address = "2a11:6c7:2001:cc00::1/64";
+  vmIpv6Subnet = "2a11:6c7:2001:cc01::/64";
+  route64Gateway = "2a11:6c7:f03:163::1";
+  route64Address = "2a11:6c7:f03:163::2/64";
+  bgpPeer = "2a11:6c7:2001:cc00:3256:fff:fe20:8f18";
+  bgpAsn = "4261420343";
+  wireguardMtu = 1420;
+  adguardPort = 19234;
+in
 {
   boot.kernel.sysctl = {
     "net.ipv4.conf.all.forwarding" = 1;
@@ -26,13 +41,13 @@
     matchConfig.Name = "eno3";
     linkConfig.RequiredForOnline = true;
     addresses = [
-      { Address = "10.120.0.1/24"; }
-      { Address = "fd8c:ac79:8818::1/64"; }
-      { Address = "2a11:6c7:2001:cc00::1/64"; }
+      { Address = lanAddress; }
+      { Address = ulaAddress; }
+      { Address = publicIpv6Address; }
     ];
     routes = [
       {
-        Gateway = "2a11:6c7:f03:163::1";
+        Gateway = route64Gateway;
         Destination = "::/0";
       }
     ];
@@ -41,7 +56,7 @@
     networkConfig.IPv6AcceptRA = false;
     networkConfig.ConfigureWithoutCarrier = true;
     networkConfig.IPv6SendRA = false;
-    networkConfig.DNS = "10.120.0.1";
+    networkConfig.DNS = lanIp;
     ipv6SendRAConfig.Managed = false;
     ipv6SendRAConfig.EmitDomains = true;
     ipv6SendRAConfig.Domains = "arvinderd.com";
@@ -49,17 +64,17 @@
       {
         AddressAutoconfiguration = true;
         OnLink = true;
-        Prefix = "2a11:6c7:2001:cc00::1/64";
+        Prefix = publicIpv6Address;
       }
       {
         AddressAutoconfiguration = true;
         OnLink = true;
-        Prefix = "fd8c:ac79:8818::1/64";
+        Prefix = ulaAddress;
       }
     ];
-    dhcpServerConfig.SendOption = "138:ipv4address:10.120.3.5";
+    dhcpServerConfig.SendOption = "138:ipv4address:${dhcpOption138Target}";
     dhcpServerConfig.EmitDNS = "yes";
-    dhcpServerConfig.DNS = "10.120.0.1";
+    dhcpServerConfig.DNS = lanIp;
     networkConfig.IPMasquerade = "ipv4";
     # 1-100 is reserved.
     dhcpServerConfig.PoolSize = 99;
@@ -77,7 +92,7 @@
     netdevConfig = {
       Name = "route64";
       Kind = "wireguard";
-      MTUBytes = 1420;
+      MTUBytes = wireguardMtu;
     };
     wireguardConfig = {
       PrivateKeyFile = "${config.age.secrets.wireguardKey.path}";
@@ -96,12 +111,10 @@
   systemd.network.networks."40-route64" = {
     matchConfig.Name = "route64";
     linkConfig.RequiredForOnline = true;
-    addresses = [
-      { Address = "2a11:6c7:f03:163::2/64"; }
-    ];
+    addresses = [{ Address = route64Address; }];
     routes = [
       {
-        Gateway = "2a11:6c7:f03:163::1";
+        Gateway = route64Gateway;
         Destination = "::/0";
       }
     ];
@@ -129,140 +142,123 @@
   networking.nftables.checkRuleset = true;
   networking.nftables.ruleset = ''
     define INTERNAL = { "podman0", "eno3", "eno4" }
-    define HERTA = "2a11:6c7:2001:cc00:3256:fff:fe20:8f18"
-    define HERTA_VMS = { 2a11:6c7:2001:cc01::/64 }
+    define HERTA = "${bgpPeer}"
+    define HERTA_VMS = { ${vmIpv6Subnet} }
     define WORLD = { "eno2", "route64" }
 
     table ip portforwards {
       chain PREROUTING {
         type nat hook prerouting priority -100;
 
-        iifname $WORLD tcp dport 80 dnat 10.120.0.101:80
-        iifname $WORLD tcp dport 443 dnat 10.120.0.101:443
-        iifname $WORLD udp dport 443 dnat 10.120.0.101:443
-        iifname $WORLD tcp dport 25565 dnat 10.120.3.2:25565
-        iifname $WORLD tcp dport 25567 dnat 10.120.3.2:25567
+        iifname $WORLD tcp dport 80 dnat ${webForwardTarget}:80
+        iifname $WORLD tcp dport 443 dnat ${webForwardTarget}:443
+        iifname $WORLD udp dport 443 dnat ${webForwardTarget}:443
+        iifname $WORLD tcp dport 25565 dnat ${vmForwardTarget}:25565
+        iifname $WORLD tcp dport 25567 dnat ${vmForwardTarget}:25567
       }
     }
 
     table ip6 FW {
-        chain FORWARD {
-            type filter hook forward priority filter; policy drop;
-            ct state established,related accept
-            iifname $INTERNAL oifname $INTERNAL counter accept
-            ct state invalid counter log prefix "INVALID: " level warn drop
-            iifname $INTERNAL oifname $WORLD counter accept
-            iifname $INTERNAL ip6 daddr $HERTA_VMS counter accept
-            ip6 daddr $HERTA counter accept
-            meta l4proto ipv6-icmp counter accept
-        }
-        chain INCOMING {
-            type filter hook input priority filter; policy accept;
-            iifname "lo" accept
-            tcp dport 22 accept
-            tcp dport { 80, 443 } accept
-
-            # BGP
-            iifname $INTERNAL tcp dport 179 counter accept
-
-            # LDAP
-            iifname $INTERNAL tcp dport { 6360, 3890 } accept
-            tcp dport { 80, 443 } accept
-
-            # DNS
-            iifname $INTERNAL tcp dport { 53 } accept
-            iifname $INTERNAL udp dport { 53 } accept
-
-            meta l4proto ipv6-icmp accept
-            ct state established,related accept
-            ct state invalid counter drop
-            counter
-        }
-
-        chain OUTGOING {
-            type filter hook output priority filter; policy accept;
-        }
+      chain FORWARD {
+        type filter hook forward priority filter; policy drop;
+        ct state established,related accept
+        iifname $INTERNAL oifname $INTERNAL counter accept
+        ct state invalid counter log prefix "INVALID: " level warn drop
+        iifname $INTERNAL oifname $WORLD counter accept
+        iifname $INTERNAL ip6 daddr $HERTA_VMS counter accept
+        ip6 daddr $HERTA counter accept
+        meta l4proto ipv6-icmp counter accept
+      }
+      chain INCOMING {
+        type filter hook input priority filter; policy accept;
+        iifname "lo" accept
+        tcp dport 22 accept
+        tcp dport { 80, 443 } accept
+        iifname $INTERNAL tcp dport 179 counter accept
+        iifname $INTERNAL tcp dport { 6360, 3890 } accept
+        iifname $INTERNAL tcp dport 53 accept
+        iifname $INTERNAL udp dport 53 accept
+        meta l4proto ipv6-icmp accept
+        ct state established,related accept
+        ct state invalid counter drop
+        counter
+      }
+      chain OUTGOING {
+        type filter hook output priority filter; policy accept;
+      }
     }
 
     table ip FW {
-    	 chain FORWARD {
-            type filter hook forward priority filter; policy drop;
-            ct state established,related accept
-            ct state invalid counter drop
-            iifname $INTERNAL oifname $WORLD counter accept
-            iifname $INTERNAL oifname "podman0" counter accept
-            ip daddr 10.120.0.101 accept
-            ip daddr 10.120.3.0/24 accept
-            meta l4proto icmp accept
-            counter
-    	 }
+      chain FORWARD {
+        type filter hook forward priority filter; policy drop;
+        ct state established,related accept
+        ct state invalid counter drop
+        iifname $INTERNAL oifname $WORLD counter accept
+        iifname $INTERNAL oifname "podman0" counter accept
+        ip daddr ${webForwardTarget} accept
+        ip daddr ${vmSubnet} accept
+        meta l4proto icmp accept
+        counter
+      }
       chain INCOMING {
-          type filter hook input priority filter; policy drop;
-          ct state established,related accept
-          ct state invalid counter drop
-          meta iifname "lo" accept
-
-          # DNS
-          iifname $INTERNAL tcp dport { 53 } accept
-          iifname $INTERNAL udp dport { 53 } accept
-          iifname $INTERNAL tcp dport { 22 } accept
-          iifname $INTERNAL tcp dport { 443 } accept
-          iifname $INTERNAL udp dport { 443 } accept
-          iifname $INTERNAL tcp dport { 80 } accept
-
-          iifname $INTERNAL tcp dport { 29810, 29811-29817, 8043, 8843, 8088 } accept
-          iifname $INTERNAL udp dport { 19810, 27001, 29810, 29811-29817 } accept
-          udp dport 67 accept
-          meta l4proto icmp accept
-          counter
+        type filter hook input priority filter; policy drop;
+        ct state established,related accept
+        ct state invalid counter drop
+        meta iifname "lo" accept
+        iifname $INTERNAL tcp dport 53 accept
+        iifname $INTERNAL udp dport 53 accept
+        iifname $INTERNAL tcp dport 22 accept
+        iifname $INTERNAL tcp dport 443 accept
+        iifname $INTERNAL udp dport 443 accept
+        iifname $INTERNAL tcp dport 80 accept
+        iifname $INTERNAL tcp dport { 29810, 29811-29817, 8043, 8843, 8088 } accept
+        iifname $INTERNAL udp dport { 19810, 27001, 29810, 29811-29817 } accept
+        udp dport 67 accept
+        meta l4proto icmp accept
+        counter
       }
       chain OUTGOING {
-          type filter hook output priority filter; policy accept;
+        type filter hook output priority filter; policy accept;
       }
     }
 
     table ip HERTA_NAT {
       chain NAT {
         type nat hook postrouting priority srcnat; policy accept;
-
-        ip saddr 10.120.3.0/24 oifname $WORLD masquerade
+        ip saddr ${vmSubnet} oifname $WORLD masquerade
       }
     }
-
   '';
 
   services.resolved.enable = true;
-
   services.frr.bgpd = {
     enable = true;
     options = [
-      "--listenon 2a11:6c7:2001:cc00::1" # Only listen on ULA.
+      "--listenon ${publicIpv6Address}"
     ];
   };
-  services.frr = {
-    config = ''
-      interface eno3
-        no ipv6 nd suppress-ra
-        ipv6 nd prefix 2a11:6c7:2001:cc00::1/64
-        ipv6 nd mtu 1420
-      router bgp 4261420343
-        no bgp default ipv4-unicast
-        bgp router-id 10.120.0.1
+  services.frr.config = ''
+    interface eno3
+      no ipv6 nd suppress-ra
+      ipv6 nd prefix ${publicIpv6Address}
+      ipv6 nd mtu ${toString wireguardMtu}
+    router bgp ${bgpAsn}
+      no bgp default ipv4-unicast
+      bgp router-id ${lanIp}
 
-        neighbor 2a11:6c7:2001:cc00:3256:fff:fe20:8f18 remote-as 4261420343
-        address-family ipv6 unicast
-          neighbor 2a11:6c7:2001:cc00:3256:fff:fe20:8f18 activate
-        exit-address-family
-        address-family ipv4 unicast
-          neighbor 2a11:6c7:2001:cc00:3256:fff:fe20:8f18 activate
-        exit-address-family
-    '';
-  };
+      neighbor ${bgpPeer} remote-as ${bgpAsn}
+      address-family ipv6 unicast
+        neighbor ${bgpPeer} activate
+      exit-address-family
+      address-family ipv4 unicast
+        neighbor ${bgpPeer} activate
+      exit-address-family
+  '';
   services.adguardhome = {
     enable = true;
     host = "127.0.0.1";
     allowDHCP = false;
-    port = 19234;
+    port = adguardPort;
     settings = {
       users = [
         {
@@ -271,17 +267,12 @@
         }
       ];
       dns = {
-        bind_hosts = [
-          # we block this using the fw, so we all good.
-          "10.120.0.1"
-        ];
+        bind_hosts = [ lanIp ];
         port = 53;
       };
     };
   };
   services.caddy.virtualHosts."dns.jingliu.arvinderd.com".extraConfig = ''
-    reverse_proxy http://127.0.0.1:19234 {
-      
-    }
+    reverse_proxy 127.0.0.1:${toString adguardPort}
   '';
 }

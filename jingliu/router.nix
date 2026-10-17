@@ -4,7 +4,8 @@
 }:
 let
   lanGatewayIpv4 = "10.120.0.1";
-  lanInterface = "eno3";
+  lanInterface = "enp2s0";
+  wanInterface = "enp1s0";
   lanCIDR = "24";
   lanUlaGateway = "fd8c:ac79:8818::1";
   lanGuaGateway = "2a11:6c7:2001:cc00::1";
@@ -27,14 +28,14 @@ in
   boot.kernel.sysctl = {
     "net.ipv4.conf.all.forwarding" = 1;
     "net.ipv6.conf.all.forwarding" = 1;
-    "net.ipv6.conf.eno2.accept_ra" = 2;
-    "net.ipv6.conf.eno2.autoconf" = 1;
-    "net.ipv6.conf.eno2.accept_ra_pinfo" = 1;
+    "net.ipv6.conf.${wanInterface}.accept_ra" = 2;
+    "net.ipv6.conf.${wanInterface}.autoconf" = 1;
+    "net.ipv6.conf.${wanInterface}.accept_ra_pinfo" = 1;
   };
   systemd.network.enable = true;
 
   systemd.network.networks."0-wan" = {
-    matchConfig.Name = "eno2";
+    matchConfig.Name = "${wanInterface}";
     networkConfig.DHCP = "ipv4";
     networkConfig.DHCPServer = false;
     networkConfig.IPv6AcceptRA = false;
@@ -79,8 +80,8 @@ in
     matchConfig.Name = "eno4";
     linkConfig.RequiredForOnline = false;
   };
-  systemd.network.networks."25-eno1" = {
-    matchConfig.Name = "eno1";
+  systemd.network.networks."25-${lanInterface}" = {
+    matchConfig.Name = "${lanInterface}";
     linkConfig.RequiredForOnline = false;
   };
   systemd.network.netdevs."30-wireguard-route64" = {
@@ -119,20 +120,6 @@ in
 
   services.caddy.acmeCA = "https://bronya.arvinderd.com/acme/ACME/directory";
 
-  environment.persistence."/persist".directories = [
-    {
-      directory = "/persist/omada-controller/data";
-      mode = "0777";
-    }
-    {
-      directory = "/persist/omada-controller/logs";
-      mode = "0777";
-    }
-    {
-      directory = "/var/lib/private/AdGuardHome";
-      mode = "0777";
-    }
-  ];
   networking.useDHCP = false;
   networking.firewall.enable = false;
   networking.nftables.enable = true;
@@ -141,7 +128,7 @@ in
     define INTERNAL = { "podman0", "${lanInterface}", "eno4" }
     define HERTA = "${hertaIpv6}"
     define HERTA_VMS = { 2a11:6c7:2001:cc01::/64 }
-    define WORLD = { "eno2", "route64" }
+    define WORLD = { "${wanInterface}", "route64" }
 
     table ip portforwards {
       chain PREROUTING {

@@ -21,11 +21,9 @@
     # ./applications/paperless.nix
     ../lib/base.nix
   ];
-
-  # Use the GRUB 2 boot loader.
-  boot.loader.grub.enable = true;
-  # Define on which hard drive you want to install Grub.
-  boot.loader.grub.device = "/dev/sda";
+  # Use the systemd-boot EFI boot loader.
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = "jingliu"; # Define your hostname.
   # Pick only one of the below networking options.
@@ -52,27 +50,6 @@
     "root"
     "@wheel"
   ];
-
-  # I should really move the ddns and jellyfin stuff into their own files.
-  environment.persistence."/persist" = {
-    enable = true;
-    hideMounts = true;
-    directories = [
-      "/var/log"
-      "/var/lib/nixos"
-      "/var/lib/systemd/coredump"
-      "/etc/nixos"
-      {
-        directory = "/etc/ssh";
-        user = "root";
-        group = "root";
-        mode = "0755";
-      }
-    ];
-    files = [
-      "/etc/machine-id"
-    ];
-  };
 
   users.users.gha = {
     isNormalUser = true;

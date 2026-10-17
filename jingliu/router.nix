@@ -4,6 +4,7 @@
 }:
 let
   lanGatewayIpv4 = "10.120.0.1";
+  lanInterface = "eno3";
   lanCIDR = "24";
   lanUlaGateway = "fd8c:ac79:8818::1";
   lanGuaGateway = "2a11:6c7:2001:cc00::1";
@@ -41,7 +42,7 @@ in
     linkConfig.RequiredForOnline = true;
   };
   systemd.network.networks."10-lan" = {
-    matchConfig.Name = "eno3";
+    matchConfig.Name = "${lanInterface}";
     linkConfig.RequiredForOnline = true;
     addresses = [
       { Address = "${lanGatewayIpv4}/${lanCIDR}"; }
@@ -137,7 +138,7 @@ in
   networking.nftables.enable = true;
   networking.nftables.checkRuleset = true;
   networking.nftables.ruleset = ''
-    define INTERNAL = { "podman0", "eno3", "eno4" }
+    define INTERNAL = { "podman0", "${lanInterface}", "eno4" }
     define HERTA = "${hertaIpv6}"
     define HERTA_VMS = { 2a11:6c7:2001:cc01::/64 }
     define WORLD = { "eno2", "route64" }
@@ -250,7 +251,7 @@ in
   };
   services.frr = {
     config = ''
-      interface eno3
+      interface ${lanInterface}
         no ipv6 nd suppress-ra
         ipv6 nd prefix ${lanGuaGateway}/64
         ipv6 nd mtu 1420

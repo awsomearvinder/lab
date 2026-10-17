@@ -27,7 +27,7 @@
 
   services.step-ca = {
     enable = true;
-    address = "10.120.3.3";
+    address = "";
     port = 443;
     openFirewall = true;
     intermediatePasswordFile = "${config.age.secrets.step_password.path}";

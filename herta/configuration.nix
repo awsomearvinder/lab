@@ -34,6 +34,7 @@
     networkConfig.DNS = "10.120.0.1";
     networkConfig.Gateway = "10.120.0.1";
     networkConfig.IPv6PrivacyExtensions = false;
+    linkConfig.RequiredForOnline = "yes"; # Options: "yes", "no", "degraded", or "routable"
   };
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;

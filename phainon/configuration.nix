@@ -71,6 +71,7 @@
     25565
     25566
     25567
+    25568
   ];
   virtualisation.oci-containers.containers.integrated_mc = {
     image = "docker.io/itzg/minecraft-server:java17";
@@ -96,6 +97,35 @@
       CF_API_KEY_FILE = "/cf.key";
       CF_FORCE_INCLUDE_MODS = "particular-reforged,status-effect-bars-reforged";
       CF_FORCE_SYNCHRONIZE = "TRUE";
+      VERSION = "1.20.1";
+    };
+  };
+  virtualisation.oci-containers.containers.better_mc = {
+    autoStart = true;
+    image = "docker.io/itzg/minecraft-server:java17";
+    volumes = [
+      "/srv/minecraft/better_mc:/data:rw"
+      "${config.age.secrets.CF_API_KEY.path}:/cf.key:ro"
+    ];
+    ports = [
+      "25568:25565"
+    ];
+    environment = {
+      EULA = "TRUE";
+      MAX_MEMORY = "10G";
+      TZ = "America/Chicago";
+      TYPE = "AUTO_CURSEFORGE";
+      DIFFICULTY = "normal";
+      WHITELIST = "John_Benber,xXScam42069Xx,cute_Gumba,YureiOwO,LinesOk,spiralitys,MajesticOwl506";
+      OPS = "John_Benber,xXScam42069Xx,YureiOwO,LinesOk";
+      GUI = "FALSE";
+      CF_SLUG = "better-mc-forge-bmc4";
+      CF_FILE_ID = "9104992";
+      CF_API_KEY_FILE = "/cf.key";
+      CF_FORCE_SYNCHRONIZE = "TRUE";
+      CF_EXCLUDE_MODS = "missing-mods-checker,audio-improvements,pack-analytics";
+      CF_FORCE_INCLUDE_MODS = "wakes-reforged";
+
       VERSION = "1.20.1";
     };
   };

@@ -139,6 +139,7 @@ in
         iifname $WORLD udp dport 443 dnat ${hertaIp}:443
         iifname $WORLD tcp dport 25565 dnat 10.120.3.2:25565
         iifname $WORLD tcp dport 25567 dnat 10.120.3.2:25567
+        iifname $WORLD tcp dport 25568 dnat 10.120.3.2:25568
       }
     }
 
